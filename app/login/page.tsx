@@ -1,8 +1,30 @@
-'use client'
-import React from "react";
+"use client";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import { Button, Input } from "@nextui-org/react";
+import { getCurrentUser, login } from "@/services/gateway";
 
 export default function Login() {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const router = useRouter();
+
+  const submit = async () => {
+    try {
+      const isLogin = await login(email, password);
+      if (!isLogin) {
+        alert("Wrong Credential");
+      } else {
+        const user = await getCurrentUser();
+        Cookies.set("user", JSON.stringify(user));
+        router.push("/");
+      }
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  };
+
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -19,7 +41,12 @@ export default function Login() {
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm text-center">
         <div className="space-y-6">
           <div className="flex w-full flex-wrap md:flex-nowrap gap-4">
-            <Input type="email" label="Email" placeholder="Enter your email" />
+            <Input
+              type="email"
+              label="Email"
+              placeholder="Enter your email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
 
           <div className="flex w-full flex-wrap md:flex-nowrap gap-4">
@@ -27,11 +54,17 @@ export default function Login() {
               type="password"
               label="Password"
               placeholder="Enter your password"
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
           <div className="space-y-6" style={{ marginTop: "50px" }}>
-            <Button className="w-36" color="primary" variant="shadow">
+            <Button
+              className="w-36"
+              color="primary"
+              variant="shadow"
+              onClick={() => submit()}
+            >
               Sign In
             </Button>
             <p className="mt-10 text-center text-sm text-gray-500">
@@ -43,7 +76,12 @@ export default function Login() {
                 Register
               </a>
             </p>
-            <Button className="w-36" color="primary" variant="shadow">
+            <Button
+              className="w-36"
+              color="primary"
+              variant="shadow"
+              onClick={() => router.push("/register")}
+            >
               Register
             </Button>
           </div>
