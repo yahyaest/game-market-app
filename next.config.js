@@ -1,7 +1,7 @@
 const {
- PHASE_DEVELOPMENT_SERVER,
- PHASE_PRODUCTION_BUILD,
- PHASE_PRODUCTION_SERVER,
+  PHASE_DEVELOPMENT_SERVER,
+  PHASE_PRODUCTION_BUILD,
+  PHASE_PRODUCTION_SERVER,
 } = require("next/constants");
 
 /** @type {import('next').NextConfig} */
@@ -10,31 +10,52 @@ const {
 // module.exports = nextConfig
 
 module.exports = (phase) => {
- if (phase === PHASE_DEVELOPMENT_SERVER) {
-   return {
-     reactStrictMode: true,
-     images: {
-       domains: [
-         // "media.kitsu.io",
-       ],
-     },
-     env: {
-       GATEWAY_BASE_URL: process.env.GATEWAY_BASE_URL
-     },
-   };
- }
+  if (phase === PHASE_DEVELOPMENT_SERVER) {
+    return {
+      reactStrictMode: true,
+      images: {
+        domains: [
+          "platform-lookaside.fbsbx.com",
+          "avatars.githubusercontent.com",
+          "lh3.googleusercontent.com"
+        ],
+      },
+      env: {
+        GATEWAY_BASE_URL: process.env.GATEWAY_BASE_URL,
+        NEXTAUTH_URL: "http://localhost:3000",
+        NEXTAUTH_SECRET: "yfWh9S6TeX",
+        GOOGLE_CLIENT_ID:
+          "111284700249-rsk6ps62ndp0ql5koi6rkoijpf14d5kk.apps.googleusercontent.com",
+        GOOGLE_CLIENT_SECRET: "NLgyP0_59rhyAzIb2Gi4Zl_x",
+        FACEBOOK_CLIENT_ID: "258923086737400",
+        FACEBOOK_CLIENT_SECRET: "e44ac9d31a537fad7ffe5dfdbb4714f7",
+        GITHUB_CLIENT_ID: "bdb79fd2920340b79690",
+        GITHUB_CLIENT_SECRET: "130f2c3e0d39bc4f920834d82a63a52d2ab90f6f",
+      },
+    };
+  }
 
- // production
- return {
-   reactStrictMode: true,
-   images: {
-     domains: [
-       // "media.kitsu.io",
-     ],
-   },
-   env: {
-     GATEWAY_BASE_URL: "http://gateway:3000"
-   },
- };
+  // production
+  return {
+    reactStrictMode: true,
+    images: {
+      domains: [
+        "platform-lookaside.fbsbx.com",
+        "avatars.githubusercontent.com",
+        "lh3.googleusercontent.com"
+      ],
+    },
+    env: {
+      GATEWAY_BASE_URL: "http://gateway:3000",
+      NEXTAUTH_URL: "http://localhost:3000",
+      NEXTAUTH_SECRET: "yfWh9S6TeX",
+      GOOGLE_CLIENT_ID:
+        "111284700249-rsk6ps62ndp0ql5koi6rkoijpf14d5kk.apps.googleusercontent.com",
+      GOOGLE_CLIENT_SECRET: "NLgyP0_59rhyAzIb2Gi4Zl_x",
+      FACEBOOK_CLIENT_ID: "258923086737400",
+      FACEBOOK_CLIENT_SECRET: "e44ac9d31a537fad7ffe5dfdbb4714f7",
+      GITHUB_CLIENT_ID: "bdb79fd2920340b79690",
+      GITHUB_CLIENT_SECRET: "130f2c3e0d39bc4f920834d82a63a52d2ab90f6f",
+    },
+  };
 };
-
