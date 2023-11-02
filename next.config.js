@@ -31,6 +31,7 @@ module.exports = (phase) => {
         FACEBOOK_CLIENT_SECRET: "e44ac9d31a537fad7ffe5dfdbb4714f7",
         GITHUB_CLIENT_ID: "bdb79fd2920340b79690",
         GITHUB_CLIENT_SECRET: "130f2c3e0d39bc4f920834d82a63a52d2ab90f6f",
+        RAWG_KEY: "e3ddb64290a34ab6a15790221abfef97"
       },
     };
   }
@@ -56,6 +57,7 @@ module.exports = (phase) => {
       FACEBOOK_CLIENT_SECRET: "e44ac9d31a537fad7ffe5dfdbb4714f7",
       GITHUB_CLIENT_ID: "bdb79fd2920340b79690",
       GITHUB_CLIENT_SECRET: "130f2c3e0d39bc4f920834d82a63a52d2ab90f6f",
+      RAWG_KEY: "e3ddb64290a34ab6a15790221abfef97"
     },
   };
 };

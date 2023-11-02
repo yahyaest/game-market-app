@@ -18,7 +18,8 @@
     "next-auth": "^4.24.3",
     "react": "^18",
     "react-dom": "^18",
-    "react-icons": "^4.11.0"
+    "react-icons": "^4.11.0",
+    "ts-node": "^10.9.1"
   },
   "devDependencies": {
     "@types/node": "^20",
