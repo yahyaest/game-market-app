@@ -25,7 +25,7 @@ interface getGamesParams {
     exclude_additions?: boolean;
     exclude_parents?: boolean;
     exclude_game_series?: boolean;
-    ordering?: 'name'|'released'|'added'|'created'| 'updated'|'rating'|'metacritic'|'-name'|'-released'|'-added'|'-created'| '-updated'|'-rating'|'-metacritic';
+    ordering?: 'name'|'released'|'added'|'created'| 'updated'|'rating'|'metacritic'|'relevance'|'-name'|'-released'|'-added'|'-created'| '-updated'|'-rating'|'-metacritic'|'-relevance';
 }
 
 interface getGameAdditionParams {
