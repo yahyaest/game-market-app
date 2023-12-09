@@ -99,11 +99,10 @@ export const uploadImage = async (file: string, username: string) => {
   }
 };
 
-export const getCurrentUserAvatar = async () => {
+export const getCurrentUserAvatar = async (token : string) => {
   try {
     const gatewayBaseUrl = process.env.GATEWAY_BASE_URL;
     const currentUserAvatarUrl = `${gatewayBaseUrl}/api/images/me`;
-    const token = Cookies.get("token");
     if (!token) {
       throw Error("No token was provided. Failed to get current user data");
     }
