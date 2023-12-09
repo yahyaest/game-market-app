@@ -60,7 +60,9 @@ export default function Games() {
       <div className="grid grid-cols-1 gap-6  md:grid-cols-2 lg: lg:grid-cols-3 xl:grid-cols-4">
         {games.map((game: any, index: number) => (
           <Card
-            className={`${bgColors[index % bgColors.length]} py-4 mx-auto w-80 cursor-pointer hover:scale-105`}
+            className={`${
+              bgColors[index % bgColors.length]
+            } py-4 mx-auto w-80 cursor-pointer hover:scale-105`}
             key={game.id}
           >
             <CardHeader className="pb-0 pt-2 px-4 flex-col">
