@@ -2,13 +2,21 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { useAtom } from "jotai";
 import { Button, Input } from "@nextui-org/react";
-import { getCurrentUser, login } from "@/services/gateway";
-
+import {
+  getCurrentUser,
+  getCurrentUserAvatar,
+  login,
+} from "@/services/gateway";
+import { navbarStateIsUser, navbarStateUserAvatarUrl } from "@/store";
+import { User } from "@/models/user";
 
 export default function token() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [isUser, setIsUser] = useAtom(navbarStateIsUser);
+  const [avatarUrl, setAvatarUrl] = useAtom(navbarStateUserAvatarUrl);
   const router = useRouter();
 
   const submit = async () => {
@@ -17,8 +25,13 @@ export default function token() {
       if (!isLogin) {
         alert("Wrong Credential");
       } else {
-        const user = await getCurrentUser();
+        const user = await getCurrentUser() as User;
+        const token = Cookies.get("token");
+        const userImage = await getCurrentUserAvatar(token as string) as string;
+        user.avatarUrl = userImage;
         Cookies.set("user", JSON.stringify(user));
+        setIsUser(true);
+        setAvatarUrl(userImage)
         router.push("/");
       }
     } catch (error: any) {

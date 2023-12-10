@@ -1,40 +1,33 @@
-import { getCurrentUserAvatar } from "@/services/gateway";
+"use client";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import { useAtom } from "jotai";
 import { Avatar } from "@nextui-org/react";
-import axios from "axios";
-import { cookies } from "next/headers";
+import { navbarStateUserAvatarUrl } from "@/store";
 
 type Props = {
   session: any;
-  token: string | undefined;
+  isValidImage: boolean;
 };
 
-const checkImage = async (url: string) => {
-  try {
-    const response = await axios.get(url);
-    if (response.status == 200) {
-      return true;
-    }
-  } catch (error) {}
-  return false;
-};
+export default function UserAvatar({ session, isValidImage }: Props) {
+  const [username, setUsername] = useState<string | null>("");
+  const [avatarUrl, setAvatarUrl] = useAtom(navbarStateUserAvatarUrl);
 
-export default async function UserAvatar({ session, token }: Props) {
-  const userImage = token ? await getCurrentUserAvatar(token) : null;
-  const username = token
-    ? JSON.parse(cookies().get("user")?.value as any).username
-    : null;
-  const validImage = session
-    ? await checkImage(session.user?.image!)
-    : userImage
-    ? await checkImage(userImage)
-    : false;
-
-  console.log("validImage : ", validImage);
+  useEffect(() => {
+    const fetchData = async () => {
+      const user = Cookies.get("user") as any;
+      const userImage = user ? JSON.parse(user).avatarUrl : null;
+      setAvatarUrl(userImage);
+      setUsername(user ? JSON.parse(user).username : null);
+    };
+    fetchData();
+  }, [avatarUrl]);
 
   return (
     <div className="mx-2">
       {session ? (
-        validImage ? (
+        isValidImage ? (
           <Avatar src={session.user?.image!} />
         ) : (
           <Avatar name={session.user?.name!} />
@@ -43,9 +36,9 @@ export default async function UserAvatar({ session, token }: Props) {
         <></>
       )}
 
-      {userImage ? (
-        validImage ? (
-          <Avatar src={`${userImage}`} />
+      {username ? (
+        avatarUrl ? (
+          <Avatar src={avatarUrl} />
         ) : (
           <Avatar name={username} />
         )

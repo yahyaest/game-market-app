@@ -101,7 +101,6 @@ export default function Games() {
         initialPage={1}
         onChange={async (page: number) => {
           setCurrentPage(page);
-          console.log(page);
           const data = await getGames(page);
           setGames(data.results);
           setPageNumber(Math.floor(data.count / data.results.length));
