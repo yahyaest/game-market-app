@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { signIn, getProviders } from "next-auth/react";
+import Cookies from "js-cookie";
 import styles from "./styles.module.css";
 
 type Props = {
@@ -34,11 +35,12 @@ export default function AuthProviders({ providers }: Props) {
                     ${styles.fw_bold}
                     ${styles.text_uppercase}`}
               type="submit"
-              onClick={() =>
+              onClick={() => {
                 signIn(provider.id, {
                   callbackUrl: process.env.PROD_URL || "http://localhost:3000",
-                })
-              }
+                });
+                Cookies.set("authProvider", provider.id.toUpperCase());
+              }}
             >
               <div className="flex justify-center align-center">
                 {Icon && <Icon className="mx-3" style={{ width: "15px" }} />}

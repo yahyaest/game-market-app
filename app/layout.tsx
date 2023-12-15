@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import { cookies } from "next/headers";
 import Header from "./header";
 import { Providers } from "./providers";
-import { getServerSession, } from "next-auth";
+import { Session, getServerSession } from "next-auth";
+import { and, eq } from "drizzle-orm";
+import { db } from "@/drizzle";
+import { users } from "@/drizzle/schema";
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,14 +21,45 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession()
+  const session = await getServerSession();
+  console.log("session : ", session);
+  try {
+    if (session && (session as Session).user) {
+      const sessionDbUser = await db
+        .select()
+        .from(users)
+        .where(
+          and(
+            eq(users.email, (session as Session).user?.email as string),
+            eq(users.username, (session as Session).user?.name as string)
+          )
+        );
+      if (sessionDbUser.length === 0) {
+        const result = await db
+          .insert(users)
+          .values({
+            email: (session as Session).user?.email as string,
+            username: (session as Session).user?.name as string,
+            avatarUrl: (session as Session).user?.image as string,
+            authProvider: cookies().get("authProvider")?.value as
+              | "GOOGLE"
+              | "FACEBOOK"
+              | "GITHUB",
+          })
+          .returning();
+      } else {
+        console.log("user already exists");
+      }
+    }
+  } catch (err) {
+    console.log("error : ", err);
+  }
+
   return (
     <html lang="en" className="dark text-foreground bg-background">
       <body className={`dark text-foreground bg-background ${inter.className}`}>
-        <Header  session={session}/>
-        <Providers session={session}>
-          {children}
-        </Providers>
+        <Header session={session} />
+        <Providers session={session}>{children}</Providers>
       </body>
     </html>
   );

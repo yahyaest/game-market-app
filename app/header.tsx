@@ -12,7 +12,6 @@ type Props = {
 const checkImage = async (url: string) => {
   try {
     const response = await axios.get(url);
-    console.log("url is : ", response.status);
     if (response.status == 200) {
       return true;
     }

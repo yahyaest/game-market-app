@@ -1,0 +1,27 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1702604352745,
+      "tag": "0000_previous_black_cat",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1702604436157,
+      "tag": "0001_motionless_randall_flagg",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1702665361233,
+      "tag": "0002_cool_shriek",
+      "breakpoints": true
+    }
+  ]
+}

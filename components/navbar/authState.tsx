@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { signOut } from "next-auth/react";
 import { useAtom } from "jotai";
+import Cookies from "js-cookie";
 import { logout } from "@/services/gateway";
 import { Button } from "@nextui-org/react";
 import { navbarStateIsUser, navbarStateUserAvatarUrl } from "@/store";
@@ -28,6 +29,7 @@ export default function AuthState({ session, token }: Props) {
           variant="shadow"
           onClick={() => {
             session ? signOut() : logout();
+            session ? Cookies.remove("authProvider") : null
             setIsUser(false);
             setUserToken("");
             setAvatarUrl("")
