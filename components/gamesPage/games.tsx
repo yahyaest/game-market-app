@@ -71,7 +71,17 @@ export default function GamesPage({ getGames, serverGamesResponse }: Props) {
                     )}
                   </div>
                 </div>
-                <h4 className="font-bold text-large">{game.name}</h4>
+                <h4
+                  className={`${
+                    game.name.length <= 30
+                      ? "font-bold text-large"
+                      : game.name.length <= 45
+                      ? "font-bold text-[0.8rem]"
+                      : "font-bold text-[0.7rem]"
+                  } h-8 `}
+                >
+                  {game.name}
+                </h4>
               </CardHeader>
               <CardBody className="overflow-visible py-2">
                 <Image
