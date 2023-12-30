@@ -70,9 +70,11 @@ export default async function GameInfo({ params }: Params) {
     // price, inventory, products_promotions  in store product model
   };
 
-  // const gameInfo = await getGameInfo(id);
+  const gameInfo = await getGameInfo(id);
   // console.log(gameInfo.trailers);
   return (
-    <div className="flex min-h-screen flex-col items-center justify-between p-16"></div>
+    <div className="flex min-h-screen flex-col items-center justify-between p-16">
+      <h1>{gameInfo.title}</h1>
+    </div>
   );
 }

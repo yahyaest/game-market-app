@@ -12,6 +12,9 @@ const {
 module.exports = (phase) => {
   if (phase === PHASE_DEVELOPMENT_SERVER) {
     return {
+      experimental: {
+        serverActions: true,
+      },
       reactStrictMode: true,
       images: {
         domains: [
@@ -39,6 +42,9 @@ module.exports = (phase) => {
 
   // production
   return {
+    experimental: {
+      serverActions: true,
+    },
     reactStrictMode: true,
     images: {
       domains: [
