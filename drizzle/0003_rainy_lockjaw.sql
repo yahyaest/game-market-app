@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS "games" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	"updatedAt" timestamp,
+	"title" text NOT NULL,
+	"slug" text NOT NULL,
+	"description" text,
+	"metacritic" integer,
+	"released" text,
+	"background_image" text,
+	"background_image_additional" text,
+	"screenshots" json,
+	"website" text,
+	"rating" real,
+	"ratings_count" integer,
+	"platforms" json,
+	"stores" json,
+	"trailers" json,
+	"developers" json,
+	"genres" json,
+	"tags" json,
+	"publishers" json
+);
