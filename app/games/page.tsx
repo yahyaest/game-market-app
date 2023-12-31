@@ -1,4 +1,3 @@
-import PaginationComponent from "@/components/gamesPage/pagination";
 import { rawg } from "../../rawg.io_api/rawg";
 import GamesPage from "@/components/gamesPage/games";
 

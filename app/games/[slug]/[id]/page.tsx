@@ -3,6 +3,7 @@ import { games } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { Game } from "@/models/game";
 import { rawg } from "@/rawg.io_api/rawg";
+import { postProduct } from "@/services/store";
 
 type Params = {
   params: {
@@ -15,7 +16,6 @@ export default async function GameInfo({ params }: Params) {
   const Client = new rawg(process.env.RAWG_KEY);
   const { id } = params;
 
-  // getGameInfo
   const getGameInfo = async (id: string) => {
     try {
       const gameInfo = await Client.games.getGameDetails(id);
@@ -115,6 +115,45 @@ export default async function GameInfo({ params }: Params) {
       }
     } catch (error) {
       console.log("error : ", error);
+    }
+  };
+
+  const addGameToStore = async (gameInfo: Game) => {
+    // TODO : Only Admin can add product to store (activate api auth guard in store django app)
+    // TODO : A button "Add To Store" should appear if user is admin and game/product isn't in store ===> a form will appear to select collection, price,inventory, promotions ===> server action
+
+    try {
+      // TODO : get products by slug qeury params. if product pass else post peoduct
+      const externalArgs = {
+        metacritic: gameInfo.metacritic,
+        released: gameInfo.released,
+        background_image: gameInfo.background_image,
+        background_image_additional: gameInfo.background_image_additional,
+        website: gameInfo.website,
+        rating: gameInfo.rating,
+        ratings_count: gameInfo.ratings_count,
+        platforms: gameInfo.platforms,
+        stores: gameInfo.stores,
+        trailers: gameInfo.trailers,
+        developers: gameInfo.developers,
+        genres: gameInfo.genres,
+        publishers: gameInfo.publishers,
+      };
+
+      const payload = {
+        title: gameInfo.title,
+        slug: gameInfo.slug,
+        description: gameInfo.description,
+        price: 0,
+        inventory: 0,
+        collection_id: 0,
+        external_args: externalArgs,
+      };
+
+      const storeProduct = await postProduct(payload);
+      console.log(storeProduct);
+    } catch (error) {
+      console.log(error);
     }
   };
 

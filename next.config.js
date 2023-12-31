@@ -25,6 +25,7 @@ module.exports = (phase) => {
       },
       env: {
         GATEWAY_BASE_URL: process.env.GATEWAY_BASE_URL,
+        STORE_BASE_URL: process.env.STORE_BASE_URL,
         NEXTAUTH_URL: "http://localhost:3000",
         NEXTAUTH_SECRET: "yfWh9S6TeX",
         GOOGLE_CLIENT_ID:
@@ -55,6 +56,7 @@ module.exports = (phase) => {
     },
     env: {
       GATEWAY_BASE_URL: "http://gateway:3000",
+      STORE_BASE_URL: process.env.STORE_BASE_URL,
       NEXTAUTH_URL: "http://localhost:3000",
       NEXTAUTH_SECRET: "yfWh9S6TeX",
       GOOGLE_CLIENT_ID:
