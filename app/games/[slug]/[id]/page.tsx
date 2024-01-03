@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { Game } from "@/models/game";
 import { rawg } from "@/rawg.io_api/rawg";
 import { postProduct } from "@/services/store";
+import { Chip } from "@nextui-org/react";
 
 type Params = {
   params: {
@@ -12,6 +13,14 @@ type Params = {
   };
 };
 
+const FieldInfo = (props: { label: string; value: JSX.Element }) => {
+  return (
+    <div className="flex flex-col my-3">
+      <p className="text-gray-600">{props.label}</p>
+      <div>{props.value}</div>
+    </div>
+  );
+};
 export default async function GameInfo({ params }: Params) {
   const Client = new rawg(process.env.RAWG_KEY);
   const { id } = params;
@@ -166,6 +175,31 @@ export default async function GameInfo({ params }: Params) {
       <h1>{gameInfo.title}</h1>
       <img src={gameInfo.background_image} alt="" />
       <p>{gameInfo.description}</p>
+
+      <div className="grid grid-cols-2 gap-6">
+      <FieldInfo label={"Platforms"} value={gameInfo.platforms.toString()} />
+      <FieldInfo label={"Genre"} value={gameInfo.genres.toString()} />
+      <FieldInfo label={"Developer"} value={gameInfo.developers.toString()} />
+      <FieldInfo label={"Publisher"} value={gameInfo.publishers.toString()} />
+      <FieldInfo label={"Release date"} value={gameInfo.released} />
+      <FieldInfo
+        label={"Metascore"}
+        value={
+          <Chip color="warning" variant="shadow">
+            {gameInfo.metacritic}
+          </Chip>
+        }
+      />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4">
+      <FieldInfo label={"Tags"} value={gameInfo.tags.toString()} />
+      <FieldInfo
+        label={"Website"}
+        value={<a href={gameInfo.website}>{gameInfo.website}</a>}
+      />
+      </div>
+
     </div>
   ) : (
     <div>
