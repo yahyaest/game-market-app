@@ -1,10 +1,15 @@
+import { cookies } from "next/headers";
 import { db } from "@/drizzle";
 import { games } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { Game } from "@/models/game";
 import { rawg } from "@/rawg.io_api/rawg";
-import { postProduct } from "@/services/store";
+import { getCollections, getProducts, postProduct } from "@/services/store";
 import { Chip } from "@nextui-org/react";
+import { User } from "@/models/user";
+import { Collection } from "@/models/collection";
+import AddToStore from "@/components/gameInfoPage/addToStore";
+import { Product } from "../../../../models/product";
 
 type Params = {
   params: {
@@ -21,9 +26,15 @@ const FieldInfo = (props: { label: string; value: JSX.Element }) => {
     </div>
   );
 };
+
 export default async function GameInfo({ params }: Params) {
   const Client = new rawg(process.env.RAWG_KEY);
   const { id } = params;
+  const user: User = cookies().get("user")
+    ? JSON.parse(cookies().get("user")?.value as string)
+    : null;
+  const token = cookies().get("token")?.value as string;
+  const storeCollection: Collection[] = await getCollections();
 
   const getGameInfo = async (id: string) => {
     try {
@@ -59,29 +70,27 @@ export default async function GameInfo({ params }: Params) {
       });
 
       return {
-        title: gameInfo.name, // store product model + game model
-        slug: gameInfo.slug, // store product model + game model
-        description: gameInfo.description_raw, // store product model + game model
-        metacritic: gameInfo.metacritic, //game model + store.external_args
-        released: gameInfo.released, //game model + store.external_args
-        background_image: gameInfo.background_image, //game model + store.external_args
-        background_image_additional: gameInfo.background_image_additional, //game model + store.external_args
-        screenshots: gameScreenshots.results.map((item: any) => item.image), //game model + store product_images model
-        website: gameInfo.website, //game model + store.external_args
-        rating: gameInfo.rating, //game model + store.external_args
-        ratings_count: gameInfo.ratings_count, //game model + store.external_args
+        title: gameInfo.name,
+        slug: gameInfo.slug,
+        description: gameInfo.description_raw,
+        metacritic: gameInfo.metacritic,
+        released: gameInfo.released,
+        background_image: gameInfo.background_image,
+        background_image_additional: gameInfo.background_image_additional,
+        screenshots: gameScreenshots.results.map((item: any) => item.image),
+        website: gameInfo.website,
+        rating: gameInfo.rating,
+        ratings_count: gameInfo.ratings_count,
         platforms: gameInfo.parent_platforms.map(
           (item: any) => item.platform.slug
-        ), //game model + store.external_args
-        stores, //game model + store.external_args
-        trailers, //game model + store.external_args
-        developers: gameInfo.developers.map((item: any) => item.name), //game model + store.external_args
-        genres: gameInfo.genres.map((item: any) => item.name), //game model + store.external_args
-        tags: gameInfo.tags.map((item: any) => item.name), // store product model + game model
-        publishers: gameInfo.publishers.map((item: any) => item.name), //game model + store.external_args
+        ),
+        stores,
+        trailers,
+        developers: gameInfo.developers.map((item: any) => item.name),
+        genres: gameInfo.genres.map((item: any) => item.name),
+        tags: gameInfo.tags.map((item: any) => item.name),
+        publishers: gameInfo.publishers.map((item: any) => item.name),
       };
-
-      // price, inventory, products_promotions  in store product model
     } catch (error) {
       console.log(error);
       return null;
@@ -127,12 +136,14 @@ export default async function GameInfo({ params }: Params) {
     }
   };
 
-  const addGameToStore = async (gameInfo: Game) => {
-    // TODO : Only Admin can add product to store (activate api auth guard in store django app)
-    // TODO : A button "Add To Store" should appear if user is admin and game/product isn't in store ===> a form will appear to select collection, price,inventory, promotions ===> server action
-
+  const addGameToStore = async (
+    gameInfo: Game,
+    productInfo: any,
+    promotions: any
+  ) => {
+    "use server";
     try {
-      // TODO : get products by slug qeury params. if product pass else post peoduct
+      console.log(`Adding game ${gameInfo.title} to store`);
       const externalArgs = {
         metacritic: gameInfo.metacritic,
         released: gameInfo.released,
@@ -152,15 +163,17 @@ export default async function GameInfo({ params }: Params) {
       const payload = {
         title: gameInfo.title,
         slug: gameInfo.slug,
-        description: gameInfo.description,
-        price: 0,
-        inventory: 0,
-        collection_id: 0,
+        description: gameInfo.description.replace(/\n/g, "\n"),
+        price: productInfo.price,
+        inventory: productInfo.inventory,
+        collection: productInfo.collection,
         external_args: externalArgs,
+        product_images: gameInfo.screenshots,
+        product_tags: gameInfo.tags,
+        product_promotions: promotions,
       };
 
-      const storeProduct = await postProduct(payload);
-      console.log(storeProduct);
+      return await postProduct(token, payload);
     } catch (error) {
       console.log(error);
     }
@@ -168,38 +181,77 @@ export default async function GameInfo({ params }: Params) {
 
   const gameInfo = await getGameInfo(id);
   await addGameToMarket(gameInfo as Game);
-  // console.log(gameInfo);
-  // console.log(gameInfo.trailers);
+  // Search game in store
+  let isGameInStore = false;
+  const searchGameInStore: Product[] = await getProducts({
+    slug: gameInfo?.slug,
+  });
+  if (searchGameInStore.length > 0) {
+    console.log(`Game ${gameInfo?.title} is already in store.`);
+    isGameInStore = true;
+  }
+
   return gameInfo ? (
     <div className="flex min-h-screen flex-col items-center justify-between p-16">
-      <h1>{gameInfo.title}</h1>
-      <img src={gameInfo.background_image} alt="" />
-      <p>{gameInfo.description}</p>
+      <div className="flex flex-row">
+        <div>
+          <h1>{gameInfo.title}</h1>
+          <img src={gameInfo.background_image} alt="" />
+          <p>{gameInfo.description}</p>
 
-      <div className="grid grid-cols-2 gap-6">
-      <FieldInfo label={"Platforms"} value={gameInfo.platforms.toString()} />
-      <FieldInfo label={"Genre"} value={gameInfo.genres.toString()} />
-      <FieldInfo label={"Developer"} value={gameInfo.developers.toString()} />
-      <FieldInfo label={"Publisher"} value={gameInfo.publishers.toString()} />
-      <FieldInfo label={"Release date"} value={gameInfo.released} />
-      <FieldInfo
-        label={"Metascore"}
-        value={
-          <Chip color="warning" variant="shadow">
-            {gameInfo.metacritic}
-          </Chip>
-        }
-      />
+          <div className="grid grid-cols-2 gap-6">
+            <FieldInfo
+              label={"Platforms"}
+              value={gameInfo.platforms.toString()}
+            />
+            <FieldInfo label={"Genre"} value={gameInfo.genres.toString()} />
+            <FieldInfo
+              label={"Developer"}
+              value={gameInfo.developers.toString()}
+            />
+            <FieldInfo
+              label={"Publisher"}
+              value={gameInfo.publishers.toString()}
+            />
+            <FieldInfo label={"Release date"} value={gameInfo.released} />
+            <FieldInfo
+              label={"Metascore"}
+              value={
+                <Chip color="warning" variant="shadow">
+                  {gameInfo.metacritic}
+                </Chip>
+              }
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            <FieldInfo label={"Tags"} value={gameInfo.tags.toString()} />
+            <FieldInfo
+              label={"Website"}
+              value={<a href={gameInfo.website}>{gameInfo.website}</a>}
+            />
+          </div>
+        </div>
+        <div className="flex flex-row">
+          {user ? (
+            user.role === "ADMIN" ? (
+              !isGameInStore ? (
+                <AddToStore
+                  gameInfo={gameInfo as Game}
+                  addGameToStore={addGameToStore}
+                  storeCollection={storeCollection}
+                />
+              ) : (
+                <></>
+              )
+            ) : (
+              <></>
+            )
+          ) : (
+            <></>
+          )}
+        </div>
       </div>
-
-      <div className="grid grid-cols-1 gap-4">
-      <FieldInfo label={"Tags"} value={gameInfo.tags.toString()} />
-      <FieldInfo
-        label={"Website"}
-        value={<a href={gameInfo.website}>{gameInfo.website}</a>}
-      />
-      </div>
-
     </div>
   ) : (
     <div>

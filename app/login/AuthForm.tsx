@@ -12,7 +12,7 @@ import {
 import { navbarStateIsUser, navbarStateUserAvatarUrl } from "@/store";
 import { User } from "@/models/user";
 
-export default function token() {
+export default function AuthForm() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isUser, setIsUser] = useAtom(navbarStateIsUser);

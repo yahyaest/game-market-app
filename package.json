@@ -26,6 +26,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^4.11.0",
+    "tailwind-datepicker-react": "^1.4.3",
     "ts-node": "^10.9.1"
   },
   "devDependencies": {
