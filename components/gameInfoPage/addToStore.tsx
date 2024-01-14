@@ -122,7 +122,7 @@ export default function AddToStore({
     addGameToStore(gameInfo as Game, productInfo, promotions);
   };
   return (
-    <>
+    <div className="text-center my-2">
       <Button
         radius="full"
         className="bg-gradient-to-tr from-blue-500 to-green-500 text-white shadow-lg"
@@ -247,6 +247,6 @@ export default function AddToStore({
           )}
         </ModalContent>
       </Modal>
-    </>
+    </div>
   );
 }

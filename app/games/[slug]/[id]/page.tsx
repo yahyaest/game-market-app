@@ -9,7 +9,12 @@ import { Chip } from "@nextui-org/react";
 import { User } from "@/models/user";
 import { Collection } from "@/models/collection";
 import AddToStore from "@/components/gameInfoPage/addToStore";
+import parse from "html-react-parser";
+import { FaGamepad, FaPlaystation, FaXbox, FaWindows } from "react-icons/fa";
+import { SiNintendo } from "react-icons/si";
+import { RiMacbookFill } from "react-icons/ri";
 import { Product } from "../../../../models/product";
+import GameScreenshot from "@/components/gameInfoPage/gameScreenshots";
 
 type Params = {
   params: {
@@ -21,10 +26,28 @@ type Params = {
 const FieldInfo = (props: { label: string; value: JSX.Element }) => {
   return (
     <div className="flex flex-col my-3">
-      <p className="text-gray-600">{props.label}</p>
+      <p className="text-gray-600 font-bold">{props.label}</p>
       <div>{props.value}</div>
     </div>
   );
+};
+
+const PlatformIcon = (props: { platform: string }) => {
+  if (props.platform === "pc") {
+    return <FaWindows className="m-1" size={18} />;
+  }
+  if (props.platform === "playstation") {
+    return <FaPlaystation className="m-1" size={18} />;
+  }
+  if (props.platform === "xbox") {
+    return <FaXbox className="m-1" size={18} />;
+  }
+  if (props.platform === "nintendo") {
+    return <SiNintendo className="m-1" size={18} />;
+  }
+  if (props.platform === "mac") {
+    return <RiMacbookFill className="m-1" size={18} />;
+  } else return <FaGamepad className="m-1" size={18} />;
 };
 
 export default async function GameInfo({ params }: Params) {
@@ -73,6 +96,7 @@ export default async function GameInfo({ params }: Params) {
         title: gameInfo.name,
         slug: gameInfo.slug,
         description: gameInfo.description_raw,
+        description_html: gameInfo.description,
         metacritic: gameInfo.metacritic,
         released: gameInfo.released,
         background_image: gameInfo.background_image,
@@ -191,20 +215,58 @@ export default async function GameInfo({ params }: Params) {
     isGameInStore = true;
   }
 
+  // ToDo : add isStore (default false) to Game model and patch true when adlin add the game
   return gameInfo ? (
-    <div className="flex min-h-screen flex-col items-center justify-between p-16">
+    <div
+      className="flex min-h-screen flex-col items-center justify-between p-16 bg-cover bg-no-repeat bg-top"
+      style={{
+        backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 1)), url(${gameInfo.background_image})`,
+      }}
+    >
       <div className="flex flex-row">
-        <div>
-          <h1>{gameInfo.title}</h1>
-          <img src={gameInfo.background_image} alt="" />
-          <p>{gameInfo.description}</p>
+        <div className="w-2/3 mx-2">
+          <h1 className="text-center text-amber-600 text-3xl font-bold">
+            {gameInfo.title}
+          </h1>
+          <div className="grid grid-cols-1 gap-4 mx-10">
+            <FieldInfo
+              label={"About"}
+              value={
+                parse(
+                  gameInfo.description_html.replace(/<\/p>/g, "</p><br>")
+                ) as any
+              }
+            />
+          </div>
 
           <div className="grid grid-cols-2 gap-6">
             <FieldInfo
               label={"Platforms"}
-              value={gameInfo.platforms.toString()}
+              value={gameInfo.platforms.map((platform: string) => (
+                <Chip
+                  key={platform}
+                  startContent={<PlatformIcon platform={platform} />}
+                  color="primary"
+                  variant="shadow"
+                  className="m-1"
+                >
+                  {platform}
+                </Chip>
+              ))}
             />
-            <FieldInfo label={"Genre"} value={gameInfo.genres.toString()} />
+            <FieldInfo
+              label={"Genre"}
+              value={gameInfo.genres.map((genre: string) => (
+                <Chip
+                  key={genre}
+                  color="danger"
+                  variant="shadow"
+                  className="m-1"
+                >
+                  {genre}
+                </Chip>
+              ))}
+            />
             <FieldInfo
               label={"Developer"}
               value={gameInfo.developers.toString()}
@@ -217,7 +279,7 @@ export default async function GameInfo({ params }: Params) {
             <FieldInfo
               label={"Metascore"}
               value={
-                <Chip color="warning" variant="shadow">
+                <Chip color="warning" variant="shadow" className="m-1">
                   {gameInfo.metacritic}
                 </Chip>
               }
@@ -225,14 +287,27 @@ export default async function GameInfo({ params }: Params) {
           </div>
 
           <div className="grid grid-cols-1 gap-4">
-            <FieldInfo label={"Tags"} value={gameInfo.tags.toString()} />
+            <FieldInfo
+              label={"Tags"}
+              value={gameInfo.tags.map((tag: string) => (
+                <Chip
+                  key={tag}
+                  color="success"
+                  variant="shadow"
+                  className="m-1"
+                >
+                  {tag}
+                </Chip>
+              ))}
+            />
             <FieldInfo
               label={"Website"}
               value={<a href={gameInfo.website}>{gameInfo.website}</a>}
             />
           </div>
         </div>
-        <div className="flex flex-row">
+        <div className="w-1/3 mx-2">        
+          <GameScreenshot screenshots={gameInfo.screenshots}/>  
           {user ? (
             user.role === "ADMIN" ? (
               !isGameInStore ? (
@@ -251,7 +326,7 @@ export default async function GameInfo({ params }: Params) {
             <></>
           )}
         </div>
-      </div>
+      </div>      
     </div>
   ) : (
     <div>

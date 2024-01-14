@@ -5,6 +5,7 @@ export interface Game {
   title: string;
   slug: string;
   description: string;
+  description_html: string;
   metacritic: number;
   released: string;
   background_image: string;
