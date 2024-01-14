@@ -64,12 +64,14 @@ type Props = {
     productInfo: any,
     promotions: any
   ) => Promise<any>;
+  updateGame:(payload : any) => Promise<any>;
   gameInfo: Game;
   storeCollection: any[];
 };
 
 export default function AddToStore({
   addGameToStore,
+  updateGame,
   gameInfo,
   storeCollection,
 }: Props) {
@@ -120,6 +122,7 @@ export default function AddToStore({
       },
     ];
     addGameToStore(gameInfo as Game, productInfo, promotions);
+    updateGame({ is_store: true });
   };
   return (
     <div className="text-center my-2">

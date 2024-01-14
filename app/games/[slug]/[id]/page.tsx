@@ -160,6 +160,15 @@ export default async function GameInfo({ params }: Params) {
     }
   };
 
+  const updateGame = async (payload: any) => {
+    "use server";
+    try {
+      await db.update(games).set(payload).where(eq(games.slug, params.slug));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const addGameToStore = async (
     gameInfo: Game,
     productInfo: any,
@@ -215,7 +224,6 @@ export default async function GameInfo({ params }: Params) {
     isGameInStore = true;
   }
 
-  // ToDo : add isStore (default false) to Game model and patch true when adlin add the game
   return gameInfo ? (
     <div
       className="flex min-h-screen flex-col items-center justify-between p-16 bg-cover bg-no-repeat bg-top"
@@ -306,14 +314,15 @@ export default async function GameInfo({ params }: Params) {
             />
           </div>
         </div>
-        <div className="w-1/3 mx-2">        
-          <GameScreenshot screenshots={gameInfo.screenshots}/>  
+        <div className="w-1/3 mx-2">
+          <GameScreenshot screenshots={gameInfo.screenshots} />
           {user ? (
             user.role === "ADMIN" ? (
               !isGameInStore ? (
                 <AddToStore
                   gameInfo={gameInfo as Game}
                   addGameToStore={addGameToStore}
+                  updateGame={updateGame}
                   storeCollection={storeCollection}
                 />
               ) : (
@@ -326,7 +335,7 @@ export default async function GameInfo({ params }: Params) {
             <></>
           )}
         </div>
-      </div>      
+      </div>
     </div>
   ) : (
     <div>
