@@ -9,6 +9,7 @@ import {
   unique,
   json,
   real,
+  boolean,
 } from "drizzle-orm/pg-core";
 
 export const roleyEnum = pgEnum("role", ["ADMIN", "USER"]);
@@ -58,4 +59,5 @@ export const games = pgTable("games", {
   genres: json("genres"),
   tags: json("tags"),
   publishers: json("publishers"),
+  is_store: boolean("is_store").default(false)
 });
