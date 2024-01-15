@@ -12,7 +12,7 @@ import {
   boolean,
 } from "drizzle-orm/pg-core";
 
-export const roleyEnum = pgEnum("role", ["ADMIN", "USER"]);
+export const roleEnum = pgEnum("role", ["ADMIN", "USER"]);
 export const authProviderEnum = pgEnum("authProvider", [
   "GOOGLE",
   "FACEBOOK",
@@ -28,7 +28,7 @@ export const users = pgTable(
     phone: integer("phone"),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     updatedAt: timestamp("updatedAt"),
-    role: roleyEnum("role").notNull().default("USER"),
+    role: roleEnum("role").notNull().default("USER"),
     avatarUrl: text("avatarUrl"),
     authProvider: authProviderEnum("authProvider"),
   },
@@ -61,3 +61,21 @@ export const games = pgTable("games", {
   publishers: json("publishers"),
   is_store: boolean("is_store").default(false)
 });
+
+export const statusEnum = pgEnum("status", ["Finshed", "Planned", "Playing", "Dropped", "Postponed"]);
+
+export const favourite_games = pgTable(
+  "favourite_games",
+  {
+    id: serial("id").primaryKey(),
+    username: text("username").notNull(),
+    email: text("email").notNull(),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt"),
+    status: statusEnum("status").notNull(),
+    gameId: integer("gameId").references(() => games.id),
+  },
+  (favourite_game) => ({
+    unique: unique().on(favourite_game.email, favourite_game.gameId),
+  })
+);
