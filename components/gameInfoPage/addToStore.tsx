@@ -125,7 +125,7 @@ export default function AddToStore({
     updateGame({ is_store: true });
   };
   return (
-    <div className="text-center my-2">
+    <div className="text-center">
       <Button
         radius="full"
         className="bg-gradient-to-tr from-blue-500 to-green-500 text-white shadow-lg"

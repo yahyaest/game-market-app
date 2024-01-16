@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { db } from "@/drizzle";
-import { games } from "@/drizzle/schema";
-import { eq } from "drizzle-orm";
+import { favourite_games, games } from "@/drizzle/schema";
+import { eq, and } from "drizzle-orm";
 import { Game } from "@/models/game";
 import { rawg } from "@/rawg.io_api/rawg";
 import { getCollections, getProducts, postProduct } from "@/services/store";
@@ -9,12 +9,21 @@ import { Chip } from "@nextui-org/react";
 import { User } from "@/models/user";
 import { Collection } from "@/models/collection";
 import AddToStore from "@/components/gameInfoPage/addToStore";
+import AddToFavourites from "@/components/gameInfoPage/addToFavourites";
+import GameScreenshot from "@/components/gameInfoPage/gameScreenshots";
 import parse from "html-react-parser";
-import { FaGamepad, FaPlaystation, FaXbox, FaWindows } from "react-icons/fa";
+import {
+  FaGamepad,
+  FaPlaystation,
+  FaXbox,
+  FaWindows,
+  FaAndroid,
+  FaLinux,
+  FaAppStoreIos,
+} from "react-icons/fa";
 import { SiNintendo } from "react-icons/si";
 import { RiMacbookFill } from "react-icons/ri";
 import { Product } from "../../../../models/product";
-import GameScreenshot from "@/components/gameInfoPage/gameScreenshots";
 
 type Params = {
   params: {
@@ -31,10 +40,12 @@ const FieldInfo = (props: { label: string; value: JSX.Element }) => {
     </div>
   );
 };
-
 const PlatformIcon = (props: { platform: string }) => {
   if (props.platform === "pc") {
     return <FaWindows className="m-1" size={18} />;
+  }
+  if (props.platform === "linux") {
+    return <FaLinux className="m-1" size={18} />;
   }
   if (props.platform === "playstation") {
     return <FaPlaystation className="m-1" size={18} />;
@@ -44,6 +55,12 @@ const PlatformIcon = (props: { platform: string }) => {
   }
   if (props.platform === "nintendo") {
     return <SiNintendo className="m-1" size={18} />;
+  }
+  if (props.platform === "android") {
+    return <FaAndroid className="m-1" size={18} />;
+  }
+  if (props.platform === "ios") {
+    return <FaAppStoreIos className="m-1" size={18} />;
   }
   if (props.platform === "mac") {
     return <RiMacbookFill className="m-1" size={18} />;
@@ -58,6 +75,54 @@ export default async function GameInfo({ params }: Params) {
     : null;
   const token = cookies().get("token")?.value as string;
   const storeCollection: Collection[] = await getCollections();
+
+  let constructorObject = {
+    isGameInStore: false,
+    isGameUserFavourite: false,
+    userGameFavouriteStatus: "",
+  };
+
+  const pageConstructor = async (constructorObject: any) => {
+    try {
+      const gameInfo = await getGameInfo(id);
+      // Find Game in Store
+      const searchGameInStore: Product[] = await getProducts({
+        slug: gameInfo?.slug,
+      });
+      if (searchGameInStore.length > 0) {
+        console.log(`Game ${gameInfo?.title} is already in store.`);
+        constructorObject.isGameInStore = true;
+      }
+      // Find whether Game is User Favourite
+      const searchGame = await db
+        .select()
+        .from(games)
+        .where(eq(games.slug, params.slug));
+
+      const gameId = searchGame[0].id;
+
+      const searchFavouriteGame = await db
+        .select()
+        .from(favourite_games)
+        .where(
+          and(
+            eq(favourite_games.email, user.email),
+            eq(favourite_games.gameId, gameId)
+          )
+        );
+      if (searchFavouriteGame.length > 0) {
+        console.log(
+          `Game ${gameInfo?.title} is already in user ${user.email} favourite List.`
+        );
+        constructorObject.isGameUserFavourite = true;
+        constructorObject.userGameFavouriteStatus =
+          searchFavouriteGame[0].status;
+      }
+      return constructorObject;
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const getGameInfo = async (id: string) => {
     try {
@@ -169,6 +234,34 @@ export default async function GameInfo({ params }: Params) {
     }
   };
 
+  const addFavouriteGameToMarket = async (gameStatus: string, user: User) => {
+    "use server";
+    try {
+      if (user) {
+        console.log("User exists:", user);
+        const searchGame = await db
+          .select()
+          .from(games)
+          .where(eq(games.slug, params.slug));
+
+        const gameId = searchGame[0].id;
+        await db
+          .insert(favourite_games)
+          .values({
+            username: user.username,
+            email: user.email,
+            status: gameStatus,
+            gameId: gameId,
+          })
+          .returning();
+      } else {
+        console.log("no user is connected, Skipping.");
+      }
+    } catch (error) {
+      console.log("error : ", error);
+    }
+  };
+
   const addGameToStore = async (
     gameInfo: Game,
     productInfo: any,
@@ -212,17 +305,9 @@ export default async function GameInfo({ params }: Params) {
     }
   };
 
+  constructorObject = await pageConstructor(constructorObject);
   const gameInfo = await getGameInfo(id);
   await addGameToMarket(gameInfo as Game);
-  // Search game in store
-  let isGameInStore = false;
-  const searchGameInStore: Product[] = await getProducts({
-    slug: gameInfo?.slug,
-  });
-  if (searchGameInStore.length > 0) {
-    console.log(`Game ${gameInfo?.title} is already in store.`);
-    isGameInStore = true;
-  }
 
   return gameInfo ? (
     <div
@@ -316,24 +401,39 @@ export default async function GameInfo({ params }: Params) {
         </div>
         <div className="w-1/3 mx-2">
           <GameScreenshot screenshots={gameInfo.screenshots} />
-          {user ? (
-            user.role === "ADMIN" ? (
-              !isGameInStore ? (
-                <AddToStore
-                  gameInfo={gameInfo as Game}
-                  addGameToStore={addGameToStore}
-                  updateGame={updateGame}
-                  storeCollection={storeCollection}
-                />
+          <div className="flex flex-row justify-center align-middle my-3 space-x-3">
+            {user ? (
+              user.role === "ADMIN" ? (
+                !constructorObject.isGameInStore ? (
+                  <AddToStore
+                    gameInfo={gameInfo as Game}
+                    addGameToStore={addGameToStore}
+                    updateGame={updateGame}
+                    storeCollection={storeCollection}
+                  />
+                ) : (
+                  <></>
+                )
               ) : (
                 <></>
               )
             ) : (
               <></>
-            )
-          ) : (
-            <></>
-          )}
+            )}
+            {user ? (
+              constructorObject.isGameUserFavourite ? (
+                <Chip color="warning" variant="bordered" className="my-2">
+                  Game {constructorObject.userGameFavouriteStatus}
+                </Chip>
+              ) : (
+                <AddToFavourites
+                  addToFavouriteGames={addFavouriteGameToMarket}
+                />
+              )
+            ) : (
+              <></>
+            )}
+          </div>
         </div>
       </div>
     </div>
