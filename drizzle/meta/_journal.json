@@ -50,6 +50,13 @@
       "when": 1705361117324,
       "tag": "0006_high_tombstone",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1705446568832,
+      "tag": "0007_good_mojo",
+      "breakpoints": true
     }
   ]
 }

@@ -79,3 +79,21 @@ export const favourite_games = pgTable(
     unique: unique().on(favourite_game.email, favourite_game.gameId),
   })
 );
+
+
+export const reviews = pgTable(
+  "reviews",
+  {
+    id: serial("id").primaryKey(),
+    username: text("username").notNull(),
+    email: text("email").notNull(),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt"),
+    comment: text("comment").notNull(),
+    rating: integer("rating"),
+    gameId: integer("gameId").references(() => games.id),
+  },
+  (review) => ({
+    unique: unique().on(review.email, review.gameId),
+  })
+);
