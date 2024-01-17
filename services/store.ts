@@ -50,3 +50,22 @@ export const postProduct = async (token: string, payload: any) => {
     console.error("Error post product:", error);
   }
 };
+
+export const postReview = async (token: string, payload: any) => {
+  try {
+    const storeBaseUrl = process.env.STORE_BASE_URL;
+    const productId = payload.product_id
+    const reviewsUrl = `${storeBaseUrl}/api/products/${productId}/reviews/`;
+
+    const options: any = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const review = await axios.post(reviewsUrl, payload, options);
+    return review.data;
+  } catch (error) {
+    console.error("Error post review:", error);
+  }
+};

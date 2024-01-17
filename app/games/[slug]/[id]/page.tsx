@@ -1,16 +1,17 @@
 import { cookies } from "next/headers";
 import { db } from "@/drizzle";
-import { favourite_games, games } from "@/drizzle/schema";
+import { favourite_games, games, reviews } from "@/drizzle/schema";
 import { eq, and } from "drizzle-orm";
 import { Game } from "@/models/game";
 import { rawg } from "@/rawg.io_api/rawg";
-import { getCollections, getProducts, postProduct } from "@/services/store";
+import { getCollections, getProducts, postProduct, postReview } from "@/services/store";
 import { Chip } from "@nextui-org/react";
 import { User } from "@/models/user";
 import { Collection } from "@/models/collection";
 import AddToStore from "@/components/gameInfoPage/addToStore";
 import AddToFavourites from "@/components/gameInfoPage/addToFavourites";
 import GameScreenshot from "@/components/gameInfoPage/gameScreenshots";
+import Reviews from "@/components/gameInfoPage/reviews";
 import parse from "html-react-parser";
 import {
   FaGamepad,
@@ -24,6 +25,7 @@ import {
 import { SiNintendo } from "react-icons/si";
 import { RiMacbookFill } from "react-icons/ri";
 import { Product } from "../../../../models/product";
+import { Review } from "@/models/review";
 
 type Params = {
   params: {
@@ -305,13 +307,58 @@ export default async function GameInfo({ params }: Params) {
     }
   };
 
+  const addReview = async (review: Review) => {
+    "use server";
+    try {
+      if (user && token) {
+        // Post review to Market App
+        const searchGame = await db
+          .select()
+          .from(games)
+          .where(eq(games.slug, params.slug));
+
+        const gameId = searchGame[0].id;
+        await db
+          .insert(reviews)
+          .values({
+            username: review.username,
+            email: review.email,
+            comment: review.comment,
+            rating: review.rating,
+            gameId,
+          })
+          .returning();
+        // Post review to store app
+        const searchGameProductInStore: Product[] = await getProducts({
+          slug: params.slug,
+        });
+        if (searchGameProductInStore.length > 0) {
+          const productId = searchGameProductInStore[0].id
+          const payload = {
+              usercustomer_namename: review.username,
+              customer_email: review.email,
+              comment: review.comment,
+              rating: review.rating,
+              product_id: productId,
+          }
+          postReview(token, payload)
+
+        }
+      } else {
+        console.log("no user is connected, Skipping.");
+      }
+    } catch (error) {
+      console.log("error : ", error);
+    }
+  };
+
   constructorObject = await pageConstructor(constructorObject);
   const gameInfo = await getGameInfo(id);
   await addGameToMarket(gameInfo as Game);
 
   return gameInfo ? (
     <div
-      className="flex min-h-screen flex-col items-center justify-between p-16 bg-cover bg-no-repeat bg-top"
+      className="flex min-h-screen flex-col justify-between p-16 bg-cover bg-no-repeat bg-top"
       style={{
         backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 1)), url(${gameInfo.background_image})`,
       }}
@@ -435,6 +482,9 @@ export default async function GameInfo({ params }: Params) {
             )}
           </div>
         </div>
+      </div>
+      <div className="">
+        <Reviews addReview={addReview} />
       </div>
     </div>
   ) : (
