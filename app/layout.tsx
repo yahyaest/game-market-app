@@ -8,6 +8,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/drizzle";
 import { users } from "@/drizzle/schema";
 import "./globals.css";
+import "primereact/resources/themes/lara-light-indigo/theme.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
