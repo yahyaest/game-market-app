@@ -2,9 +2,17 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import { getCurrentUser, register, uploadImage } from "@/services/gateway";
+import {
+  getCurrentUser,
+  getCurrentUserAvatar,
+  register,
+  uploadImage,
+} from "@/services/gateway";
 import { Button, Input } from "@nextui-org/react";
 import styles from "./styles.module.css";
+import { User } from "@/models/user";
+import { navbarStateIsUser, navbarStateUserAvatarUrl } from "@/store";
+import { useAtom } from "jotai";
 
 export default function Register() {
   const [username, setUsername] = useState<string>("");
@@ -15,6 +23,8 @@ export default function Register() {
   const [file, setFile] = useState<string>("");
   const [previewURL, setPreviewURL] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
+  const [avatarUrl, setAvatarUrl] = useAtom(navbarStateUserAvatarUrl);
+  const [isUser, setIsUser] = useAtom(navbarStateIsUser);
   const router = useRouter();
 
   const previewImage = (e: any) => {
@@ -34,10 +44,17 @@ export default function Register() {
       if (!isRegister) {
         alert("Wrong Credential");
       } else {
-        const user = await getCurrentUser();
-        Cookies.set("user", JSON.stringify(user));
+        const user = (await getCurrentUser()) as User;
         // upload image
         await uploadImage(file, user?.email as string);
+        const token = Cookies.get("token");
+        const userImage = (await getCurrentUserAvatar(
+          token as string
+        )) as string;
+        user.avatarUrl = userImage;
+        Cookies.set("user", JSON.stringify(user));
+        setIsUser(true);
+        setAvatarUrl(userImage);
         router.push("/");
       }
     } catch (error: any) {

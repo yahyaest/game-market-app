@@ -25,13 +25,15 @@ export default function AuthForm() {
       if (!isLogin) {
         alert("Wrong Credential");
       } else {
-        const user = await getCurrentUser() as User;
+        const user = (await getCurrentUser()) as User;
         const token = Cookies.get("token");
-        const userImage = await getCurrentUserAvatar(token as string) as string;
+        const userImage = (await getCurrentUserAvatar(
+          token as string
+        )) as string;
         user.avatarUrl = userImage;
         Cookies.set("user", JSON.stringify(user));
         setIsUser(true);
-        setAvatarUrl(userImage)
+        setAvatarUrl(userImage);
         router.push("/");
       }
     } catch (error: any) {
