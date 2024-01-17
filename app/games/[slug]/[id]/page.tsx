@@ -4,8 +4,13 @@ import { favourite_games, games, reviews } from "@/drizzle/schema";
 import { eq, and } from "drizzle-orm";
 import { Game } from "@/models/game";
 import { rawg } from "@/rawg.io_api/rawg";
-import { getCollections, getProducts, postProduct, postReview } from "@/services/store";
-import { Chip } from "@nextui-org/react";
+import {
+  getCollections,
+  getProducts,
+  postProduct,
+  postReview,
+} from "@/services/store";
+import { Button, Chip } from "@nextui-org/react";
 import { User } from "@/models/user";
 import { Collection } from "@/models/collection";
 import AddToStore from "@/components/gameInfoPage/addToStore";
@@ -333,16 +338,15 @@ export default async function GameInfo({ params }: Params) {
           slug: params.slug,
         });
         if (searchGameProductInStore.length > 0) {
-          const productId = searchGameProductInStore[0].id
+          const productId = searchGameProductInStore[0].id;
           const payload = {
-              usercustomer_namename: review.username,
-              customer_email: review.email,
-              comment: review.comment,
-              rating: review.rating,
-              product_id: productId,
-          }
-          postReview(token, payload)
-
+            usercustomer_namename: review.username,
+            customer_email: review.email,
+            comment: review.comment,
+            rating: review.rating,
+            product_id: productId,
+          };
+          postReview(token, payload);
         }
       } else {
         console.log("no user is connected, Skipping.");
@@ -358,13 +362,13 @@ export default async function GameInfo({ params }: Params) {
 
   return gameInfo ? (
     <div
-      className="flex min-h-screen flex-col justify-between p-16 bg-cover bg-no-repeat bg-top"
+      className="flex min-h-screen flex-col justify-between bg-cover bg-no-repeat bg-top p-4 md:p-16"
       style={{
         backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 1)), url(${gameInfo.background_image})`,
       }}
     >
-      <div className="flex flex-row">
-        <div className="w-2/3 mx-2">
+      <div className="flex flex-col lg:flex-row">
+        <div className="w-full lg:w-2/3 mx-2">
           <h1 className="text-center text-amber-600 text-3xl font-bold">
             {gameInfo.title}
           </h1>
@@ -379,7 +383,7 @@ export default async function GameInfo({ params }: Params) {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <FieldInfo
               label={"Platforms"}
               value={gameInfo.platforms.map((platform: string) => (
@@ -442,11 +446,18 @@ export default async function GameInfo({ params }: Params) {
             />
             <FieldInfo
               label={"Website"}
-              value={<a href={gameInfo.website}>{gameInfo.website}</a>}
+              value={
+                <Button
+                  radius="full"
+                  className="bg-gradient-to-tr from-red-500 to-blue-500 text-white shadow-lg w-36"
+                >
+                  <a href={gameInfo.website}>Visit</a>
+                </Button>
+              }
             />
           </div>
         </div>
-        <div className="w-1/3 mx-2">
+        <div className="w-full lg:w-1/3 mx-2">
           <GameScreenshot screenshots={gameInfo.screenshots} />
           <div className="flex flex-row justify-center align-middle my-3 space-x-3">
             {user ? (

@@ -9,7 +9,7 @@ type Props = {
 
 export default function GameScreenshot({ screenshots }: Props) {
   return (
-    <div className="grid grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-6 mx-2 sm:grid-cols-2 sm:mx-1">
       <PhotoProvider>
         {screenshots.map((screenshot: string) => (
           <PhotoView key={screenshot} src={screenshot}>
