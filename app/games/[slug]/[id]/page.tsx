@@ -31,6 +31,7 @@ import { SiNintendo } from "react-icons/si";
 import { RiMacbookFill } from "react-icons/ri";
 import { Product } from "../../../../models/product";
 import { Review } from "@/models/review";
+import { getToken, getUserAvatar } from "@/services/gateway";
 
 type Params = {
   params: {
@@ -81,6 +82,14 @@ export default async function GameInfo({ params }: Params) {
     ? JSON.parse(cookies().get("user")?.value as string)
     : null;
   const token = cookies().get("token")?.value as string;
+  // Get app token
+  const signinPayload = {
+    email: process.env.APP_USER_EMAIL as string,
+    password: process.env.APP_USER_PASSWORD as string
+  };
+
+  const appToken = await getToken(signinPayload.email, signinPayload.password);
+  const UserImage = user ?  await getUserAvatar(user.email, appToken) : null
   const storeCollection: Collection[] = await getCollections();
 
   let constructorObject = {
@@ -312,6 +321,41 @@ export default async function GameInfo({ params }: Params) {
     }
   };
 
+  const getGameReviews = async () => {
+    if (user) {
+      const searchGame = await db
+        .select()
+        .from(games)
+        .where(eq(games.slug, params.slug));
+
+      const gameId = searchGame[0].id;
+
+      return await db.select().from(reviews).where(eq(reviews.gameId, gameId));
+    } else {
+      return [];
+    }
+  };
+
+  const checkUserHasReview = async () => {
+    if (user) {
+      const searchGame = await db
+        .select()
+        .from(games)
+        .where(eq(games.slug, params.slug));
+
+      const gameId = searchGame[0].id;
+
+      const userGameReview = await db
+        .select()
+        .from(reviews)
+        .where(and(eq(reviews.email, user.email), eq(reviews.gameId, gameId)));
+      if (userGameReview.length > 0) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const addReview = async (review: Review) => {
     "use server";
     try {
@@ -328,6 +372,7 @@ export default async function GameInfo({ params }: Params) {
           .values({
             username: review.username,
             email: review.email,
+            userImage : review.userImage,
             comment: review.comment,
             rating: review.rating,
             gameId,
@@ -342,6 +387,7 @@ export default async function GameInfo({ params }: Params) {
           const payload = {
             usercustomer_namename: review.username,
             customer_email: review.email,
+            customer_image : review.userImage,
             comment: review.comment,
             rating: review.rating,
             product_id: productId,
@@ -359,6 +405,8 @@ export default async function GameInfo({ params }: Params) {
   constructorObject = await pageConstructor(constructorObject);
   const gameInfo = await getGameInfo(id);
   await addGameToMarket(gameInfo as Game);
+  const gameReviews = await getGameReviews();
+  const isUserGameReview = await checkUserHasReview();
 
   return gameInfo ? (
     <div
@@ -462,7 +510,7 @@ export default async function GameInfo({ params }: Params) {
           <div className="flex flex-row justify-center align-middle my-3 space-x-3">
             {user ? (
               user.role === "ADMIN" ? (
-                !constructorObject.isGameInStore ? (
+                !constructorObject?.isGameInStore ? (
                   <AddToStore
                     gameInfo={gameInfo as Game}
                     addGameToStore={addGameToStore}
@@ -479,9 +527,9 @@ export default async function GameInfo({ params }: Params) {
               <></>
             )}
             {user ? (
-              constructorObject.isGameUserFavourite ? (
+              constructorObject?.isGameUserFavourite ? (
                 <Chip color="warning" variant="bordered" className="my-2">
-                  Game {constructorObject.userGameFavouriteStatus}
+                  Game {constructorObject?.userGameFavouriteStatus}
                 </Chip>
               ) : (
                 <AddToFavourites
@@ -495,7 +543,7 @@ export default async function GameInfo({ params }: Params) {
         </div>
       </div>
       <div className="">
-        <Reviews addReview={addReview} />
+        <Reviews gameReviews={gameReviews as Review[]} isUserGameReview={isUserGameReview} addReview={addReview} />
       </div>
     </div>
   ) : (

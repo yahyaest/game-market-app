@@ -40,6 +40,19 @@ export const logout = () => {
   Cookies.remove("user");
 };
 
+export const getToken = async (email: string, password: string) => {
+	try {
+		const gatewayBaseUrl = process.env.GATEWAY_BASE_URL;
+		const signInUrl = `${gatewayBaseUrl}/api/auth/signin`;
+		const login = await axios.post(signInUrl, { email, password });
+		const token = login.data.access_token;
+		if (!token) return null;
+		return token;
+	} catch (error) {
+		console.error('Failed to get token:', error);
+	}
+};
+
 export const getCurrentUser = async () => {
   try {
     const gatewayBaseUrl = process.env.GATEWAY_BASE_URL;
@@ -118,4 +131,27 @@ export const getCurrentUserAvatar = async (token : string) => {
   } catch (error) {
     console.error("Error fetching image:", error);
   }
+};
+
+
+export const getUserAvatar = async (username: string, token: string) => {
+	// Token need to be of admin user
+	try {
+		const gatewayBaseUrl = process.env.GATEWAY_BASE_URL;
+		const currentUserAvatarUrl = `${gatewayBaseUrl}/api/images/?username=${username}`;
+		if (!token) {
+			throw Error('No token was provided. Failed to get current user data');
+		}
+		const options: any = {
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
+		};
+		const response = await axios.get(currentUserAvatarUrl, options);
+		const image = response.data;
+		const imageUrl = `${image[0].filename}`;
+		return imageUrl;
+	} catch (error) {
+		console.error('Error fetching image:', error);
+	}
 };
