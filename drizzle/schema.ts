@@ -87,7 +87,7 @@ export const reviews = pgTable(
     id: serial("id").primaryKey(),
     username: text("username").notNull(),
     email: text("email").notNull(),
-    user_image: text("user_image"),
+    userImage: text("userImage"),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     updatedAt: timestamp("updatedAt"),
     comment: text("comment").notNull(),
