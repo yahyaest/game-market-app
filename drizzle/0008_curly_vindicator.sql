@@ -1,0 +1,1 @@
+ALTER TABLE "favourite_games" ADD COLUMN "user_image" text;
