@@ -28,7 +28,9 @@ export default function Reviews({
       const payload = {
         username: user.username,
         email: user.email,
-        userImage: user.avatarUrl?  user.avatarUrl.substring(user.avatarUrl.lastIndexOf('/') + 1) : null,
+        userImage: user.avatarUrl
+          ? user.avatarUrl.substring(user.avatarUrl.lastIndexOf("/") + 1)
+          : null,
         customer_name: user.username,
         customer_email: user.email,
         comment,
@@ -42,10 +44,15 @@ export default function Reviews({
     }
   };
 
-  const user: User | null  = Cookies.get("user") ? JSON.parse(Cookies.get("user") as string) : null;
+  const user: User | null = Cookies.get("user")
+    ? JSON.parse(Cookies.get("user") as string)
+    : null;
+
   const averageRating = gameReviews.length
-    ? gameReviews.reduce((sum, review) => sum + review.rating, 0) /
-      gameReviews.length
+    ? (
+        gameReviews.reduce((sum, review) => sum + review.rating, 0) /
+        gameReviews.length
+      ).toFixed(1)
     : 0;
 
   return (
@@ -89,14 +96,38 @@ export default function Reviews({
           </h1>
         )}
         {gameReviews.map((review: Review) => (
-          <div key={review.id} className="my-2 space-y-2">
-            <div className="flex flex-row space-x-2">
-              {review.userImage && <Avatar src={`${process.env.GATEWAY_BASE_URL}/${review.userImage}`} />}
-              <p className = "text-amber-500 text-lg font-semibold">{review.username}</p>
+          <div
+            key={review.id}
+            className={`${
+              user
+                ? user.email === review.email
+                  ? "transition ease-in-out delay-300 bg-red-700 hover:bg-red-600"
+                  : "transition ease-in-out delay-300 bg-slate-700 hover:bg-slate-600"
+                : "transition ease-in-out delay-300 bg-slate-700 hover:bg-slate-600"
+            } bg-opacity-20 hover:bg-opacity-25 rounded-xl p-4 my-5 space-y-2`}
+          >
+            <div className="flex flex-row space-x-3">
+              {review.userImage && (
+                <Avatar
+                  src={`${process.env.GATEWAY_BASE_URL}/${review.userImage}`}
+                />
+              )}
+              <p className="text-amber-500 text-lg font-semibold">
+                {review.username}
+                {user ? (user.email === review.email ? " (me)" : null) : null}
+              </p>
             </div>
-            <div className="flex flex-row space-x-2">
-              <Rating className="text-amber-500" value={review.rating} disabled cancel={false}  />
-              {review.createdAt && <p className = "text-slate-600 text-md font-medium">{review.createdAt.toLocaleDateString('en-GB')}</p>}
+            <div className="flex flex-row space-x-3">
+              <Rating
+                value={review.rating}
+                disabled
+                cancel={false}
+              />
+              {review.createdAt && (
+                <p className="text-slate-600 text-md font-medium">
+                  {review.createdAt.toLocaleDateString("en-GB")}
+                </p>
+              )}
             </div>
             <p>{review.comment}</p>
           </div>

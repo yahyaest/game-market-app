@@ -148,6 +148,7 @@ export default function AddToStore({
           footer: "border-t-[1px] border-[#292f46]",
           closeButton: "hover:bg-white/5 active:bg-white/10",
         }}
+        className="w-80 sm:w-full"
         style={{ minHeight: "0px" }}
       >
         <ModalContent>
