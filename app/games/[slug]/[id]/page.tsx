@@ -31,7 +31,6 @@ import { SiNintendo } from "react-icons/si";
 import { RiMacbookFill } from "react-icons/ri";
 import { Product } from "../../../../models/product";
 import { Review } from "@/models/review";
-import { getToken, getUserAvatar } from "@/services/gateway";
 
 type Params = {
   params: {
@@ -82,14 +81,6 @@ export default async function GameInfo({ params }: Params) {
     ? JSON.parse(cookies().get("user")?.value as string)
     : null;
   const token = cookies().get("token")?.value as string;
-  // Get app token
-  const signinPayload = {
-    email: process.env.APP_USER_EMAIL as string,
-    password: process.env.APP_USER_PASSWORD as string
-  };
-
-  const appToken = await getToken(signinPayload.email, signinPayload.password);
-  const UserImage = user ?  await getUserAvatar(user.email, appToken) : null
   const storeCollection: Collection[] = await getCollections();
 
   let constructorObject = {
@@ -110,29 +101,31 @@ export default async function GameInfo({ params }: Params) {
         constructorObject.isGameInStore = true;
       }
       // Find whether Game is User Favourite
-      const searchGame = await db
-        .select()
-        .from(games)
-        .where(eq(games.slug, params.slug));
+      if (user) {
+        const searchGame = await db
+          .select()
+          .from(games)
+          .where(eq(games.slug, params.slug));
 
-      const gameId = searchGame[0].id;
+        const gameId = searchGame[0].id;
 
-      const searchFavouriteGame = await db
-        .select()
-        .from(favourite_games)
-        .where(
-          and(
-            eq(favourite_games.email, user.email),
-            eq(favourite_games.gameId, gameId)
-          )
-        );
-      if (searchFavouriteGame.length > 0) {
-        console.log(
-          `Game ${gameInfo?.title} is already in user ${user.email} favourite List.`
-        );
-        constructorObject.isGameUserFavourite = true;
-        constructorObject.userGameFavouriteStatus =
-          searchFavouriteGame[0].status;
+        const searchFavouriteGame = await db
+          .select()
+          .from(favourite_games)
+          .where(
+            and(
+              eq(favourite_games.email, user.email),
+              eq(favourite_games.gameId, gameId)
+            )
+          );
+        if (searchFavouriteGame.length > 0) {
+          console.log(
+            `Game ${gameInfo?.title} is already in user ${user.email} favourite List.`
+          );
+          constructorObject.isGameUserFavourite = true;
+          constructorObject.userGameFavouriteStatus =
+            searchFavouriteGame[0].status;
+        }
       }
       return constructorObject;
     } catch (err) {
@@ -322,7 +315,6 @@ export default async function GameInfo({ params }: Params) {
   };
 
   const getGameReviews = async () => {
-    if (user) {
       const searchGame = await db
         .select()
         .from(games)
@@ -331,9 +323,6 @@ export default async function GameInfo({ params }: Params) {
       const gameId = searchGame[0].id;
 
       return await db.select().from(reviews).where(eq(reviews.gameId, gameId));
-    } else {
-      return [];
-    }
   };
 
   const checkUserHasReview = async () => {
@@ -372,7 +361,7 @@ export default async function GameInfo({ params }: Params) {
           .values({
             username: review.username,
             email: review.email,
-            userImage : review.userImage,
+            userImage: review.userImage,
             comment: review.comment,
             rating: review.rating,
             gameId,
@@ -387,7 +376,8 @@ export default async function GameInfo({ params }: Params) {
           const payload = {
             usercustomer_namename: review.username,
             customer_email: review.email,
-            customer_image : review.userImage,
+            customer_image: review.userImage,
+            customer_name : review.username,
             comment: review.comment,
             rating: review.rating,
             product_id: productId,
@@ -543,7 +533,11 @@ export default async function GameInfo({ params }: Params) {
         </div>
       </div>
       <div className="">
-        <Reviews gameReviews={gameReviews as Review[]} isUserGameReview={isUserGameReview} addReview={addReview} />
+        <Reviews
+          gameReviews={gameReviews as Review[]}
+          isUserGameReview={isUserGameReview}
+          addReview={addReview}
+        />
       </div>
     </div>
   ) : (
