@@ -11,8 +11,8 @@ export const register = async (
   try {
     const gatewayBaseUrl = process.env.GATEWAY_BASE_URL;
     const signUpUrl = `${gatewayBaseUrl}/api/auth/signup`;
-    const redister = await axios.post(signUpUrl, { username, email, password, phone: phone ? phone: null });
-    const token = redister.data.access_token;
+    const register = await axios.post(signUpUrl, { username, email, password, phone: phone ? phone: null });
+    const token = register.data.access_token;
     if (!token) return false;
     Cookies.set("token", token);
     return true;

@@ -169,18 +169,11 @@ export default function Register() {
               <a
                 href="#"
                 className="font-semibold leading-6 text-primary hover:text-secondary ml-2"
+                onClick={() => router.push("/login")}
               >
                 Sign In
               </a>
             </p>
-            <Button
-              className="w-36"
-              color="primary"
-              variant="shadow"
-              onClick={() => router.push("/login")}
-            >
-              Sign In
-            </Button>
           </div>
         </div>
       </div>
