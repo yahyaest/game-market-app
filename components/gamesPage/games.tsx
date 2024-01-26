@@ -85,7 +85,7 @@ export default function GamesPage({ getGames, serverGamesResponse }: Props) {
                   {game.name}
                 </h4>
               </CardHeader>
-              <CardBody className="overflow-visible py-2">
+              <CardBody className="overflow-visible py-2 mx-3">
                 <Image
                   alt={game.name}
                   className="object-cover rounded-xl h-36"

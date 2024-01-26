@@ -1,5 +1,4 @@
 import axios from "axios";
-import { headers } from "next/headers";
 
 export const getCollections = async () => {
   try {
@@ -33,6 +32,18 @@ export const getProducts = async (queryParams: any = {}) => {
   }
 };
 
+export const getProduct = async (productId: number) => {
+  try {
+    const storeBaseUrl = process.env.STORE_BASE_URL;
+    const productsUrl = `${storeBaseUrl}/api/products/${productId}/`;
+
+    const product = await axios.get(productsUrl);
+    return product.data;
+  } catch (error) {
+    console.error("Error fetching product:", error);
+  }
+};
+
 export const postProduct = async (token: string, payload: any) => {
   try {
     const storeBaseUrl = process.env.STORE_BASE_URL;
@@ -48,6 +59,24 @@ export const postProduct = async (token: string, payload: any) => {
     return product.data;
   } catch (error) {
     console.error("Error post product:", error);
+  }
+};
+
+export const updateProduct = async (token: string, productId: number, payload: any) => {
+  try {
+    const storeBaseUrl = process.env.STORE_BASE_URL;
+    const productsUrl = `${storeBaseUrl}/api/products/${productId}/`;
+
+    const options: any = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const product = await axios.patch(productsUrl, payload, options);
+    return product.data;
+  } catch (error) {
+    console.error("Error update product:", error);
   }
 };
 

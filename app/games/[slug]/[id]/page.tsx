@@ -8,6 +8,7 @@ import {
   getCollections,
   getProducts,
   postProduct,
+  updateProduct,
   postReview,
 } from "@/services/store";
 import { Button, Chip } from "@nextui-org/react";
@@ -333,6 +334,36 @@ export default async function GameInfo({ params }: Params) {
     }
   };
 
+  const addGameTrailerToProductInStore = async () => {
+    // Add youtubeTrailer to product externalArgs for product that don't have it
+    const productsSearch: Product[] = await getProducts({
+      slug: params.slug,
+    });
+    if (productsSearch.length > 0 ) {
+      const product = productsSearch[0]
+      let productExternalArgs = product.external_args
+
+      if(!productExternalArgs["youtube_trailer"]){
+        console.log(`Add trailer to Product ${product.title}`)
+        const gameYouTubeTrailer = await getGameYouTubeTrailer(product.title) as any
+        const youtubeTrailer = {
+        title: gameYouTubeTrailer.title,
+        videoId: gameYouTubeTrailer.id,
+        url: gameYouTubeTrailer.url,
+        thumbnail: gameYouTubeTrailer.bestThumbnail.url
+      }
+      productExternalArgs["youtube_trailer"] = youtubeTrailer
+      return updateProduct(token, product.id, {external_args : productExternalArgs})
+      }
+      else{
+        console.log(`Product ${product.title} has a trailer already`)
+      }
+    }
+    else{
+      console.log(`Product ${params.slug} not found`)
+    }
+  };
+
   const getGameReviews = async () => {
       const searchGame = await db
         .select()
@@ -417,6 +448,7 @@ export default async function GameInfo({ params }: Params) {
   await addGameToMarket(gameInfo as Game);
   const gameReviews = await getGameReviews();
   const isUserGameReview = await checkUserHasReview();
+  // addGameTrailerToProductInStore()   // Add traler to Product with no trailer
 
   return gameInfo ? (
     <div
