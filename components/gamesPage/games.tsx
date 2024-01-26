@@ -73,8 +73,10 @@ export default function GamesPage({ getGames, serverGamesResponse }: Props) {
                 </div>
                 <h4
                   className={`${
-                    game.name.length <= 30
+                    game.name.length <= 20
                       ? "font-bold text-large"
+                      : game.name.length <= 30
+                      ? "font-bold text-[0.85rem]"
                       : game.name.length <= 45
                       ? "font-bold text-[0.8rem]"
                       : "font-bold text-[0.7rem]"

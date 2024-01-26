@@ -13,7 +13,7 @@ export default function GameScreenshot({ screenshots }: Props) {
       <PhotoProvider>
         {screenshots.map((screenshot: string) => (
           <PhotoView key={screenshot} src={screenshot}>
-            <img src={screenshot} alt={screenshot} className="cursor-pointer" />
+            <img src={screenshot} alt={screenshot} className="cursor-pointer transition ease-in-out delay-300 hover:scale-105" />
           </PhotoView>
         ))}
       </PhotoProvider>
