@@ -16,8 +16,10 @@ import { Collection } from "@/models/collection";
 import AddToStore from "@/components/gameInfoPage/addToStore";
 import AddToFavourites from "@/components/gameInfoPage/addToFavourites";
 import GameScreenshot from "@/components/gameInfoPage/gameScreenshots";
+import GameTrailer from "@/components/gameInfoPage/gameTrailer";
 import Reviews from "@/components/gameInfoPage/reviews";
 import parse from "html-react-parser";
+import ytSearch from "ytsr";
 import {
   FaGamepad,
   FaPlaystation,
@@ -195,6 +197,12 @@ export default async function GameInfo({ params }: Params) {
     }
   };
 
+  const getGameYouTubeTrailer = async(gameTitle : string) =>{
+    "use server";
+    const videoResult = await ytSearch(`${gameTitle} Trailer`);
+    return videoResult.items[0]
+}
+
   const addGameToMarket = async (gameInfo: Game) => {
     try {
       const searchGame = await db
@@ -279,6 +287,16 @@ export default async function GameInfo({ params }: Params) {
     "use server";
     try {
       console.log(`Adding game ${gameInfo.title} to store`);
+
+      const gameYouTubeTrailer = await getGameYouTubeTrailer(gameInfo.title) as any
+      const youtubeTrailer = {
+        title: gameYouTubeTrailer.title,
+        videoId: gameYouTubeTrailer.id,
+        url: gameYouTubeTrailer.url,
+        thumbnail: gameYouTubeTrailer.bestThumbnail.url
+        
+      }
+
       const externalArgs = {
         metacritic: gameInfo.metacritic,
         released: gameInfo.released,
@@ -293,6 +311,7 @@ export default async function GameInfo({ params }: Params) {
         developers: gameInfo.developers,
         genres: gameInfo.genres,
         publishers: gameInfo.publishers,
+        youtube_trailer: youtubeTrailer
       };
 
       const payload = {
@@ -394,6 +413,7 @@ export default async function GameInfo({ params }: Params) {
 
   constructorObject = await pageConstructor(constructorObject);
   const gameInfo = await getGameInfo(id);
+  const gameTrailer = await getGameYouTubeTrailer(gameInfo?.title)
   await addGameToMarket(gameInfo as Game);
   const gameReviews = await getGameReviews();
   const isUserGameReview = await checkUserHasReview();
@@ -496,6 +516,7 @@ export default async function GameInfo({ params }: Params) {
           </div>
         </div>
         <div className="w-full lg:w-1/3 mx-2">
+          <GameTrailer videoTrailer={gameTrailer}/>
           <GameScreenshot screenshots={gameInfo.screenshots} />
           <div className="flex flex-row justify-center align-middle my-3 space-x-3">
             {user ? (
