@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@nextui-org/react": "^2.1.13",
+    "@tanstack/react-query": "^5.17.19",
     "@types/js-cookie": "^3.0.5",
     "axios": "^1.5.1",
     "dotenv": "^16.3.1",
@@ -35,6 +36,7 @@
     "ytsr": "^3.8.4"
   },
   "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^5.17.22",
     "@types/node": "^20",
     "@types/pg": "^8.10.9",
     "@types/react": "^18",

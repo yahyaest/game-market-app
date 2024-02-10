@@ -10,5 +10,12 @@ export default async function Games() {
 
   const gamesResponse = await getGames(1);
 
-  return <GamesPage serverGamesResponse={gamesResponse} getGames={getGames} />;
+  return (
+    <GamesPage
+      serverGamesResponse={gamesResponse}
+      gameCount={gamesResponse.count}
+      getGames={getGames}
+      pageComponent={"games"}
+    />
+  );
 }

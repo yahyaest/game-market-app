@@ -6,12 +6,16 @@ type Props = {
   getGames: (page: number) => Promise<any>;
   setCurrentGames: Dispatch<SetStateAction<any>>;
   serverGamesResponse: any;
+  gameCount: number;
+  pageComponent: string
 };
 
 export default function PaginationComponent({
   getGames,
   setCurrentGames,
   serverGamesResponse,
+  gameCount,
+  pageComponent
 }: Props) {
   const [pageNumber, setPageNumber] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,8 +27,8 @@ export default function PaginationComponent({
     const fetchData = async () => {
       setPageNumber(
         Math.floor(
-          serverGamesResponse.count / serverGamesResponse.results.length
-        )
+          gameCount / serverGamesResponse.results.length
+        ) + 1
       );
       setNextPageUrl(serverGamesResponse.next);
       setPreviousPageUrl(serverGamesResponse.previous);
@@ -46,7 +50,7 @@ export default function PaginationComponent({
         onChange={async (page: number) => {
           setCurrentPage(page);
           const data = await getGames(page);
-          setCurrentGames(data.results);
+          pageComponent === "games" ? setCurrentGames(data.results) : setCurrentGames(data);
           setNextPageUrl(data.next);
           setPreviousPageUrl(data.previous);
         }}
@@ -59,7 +63,7 @@ export default function PaginationComponent({
         onClick={async () => {
           setCurrentPage(selectedPage);
           const data = await getGames(selectedPage);
-          setCurrentGames(data.results);
+          pageComponent === "games" ? setCurrentGames(data.results) : setCurrentGames(data);
           setNextPageUrl(data.next);
           setPreviousPageUrl(data.previous);
         }}

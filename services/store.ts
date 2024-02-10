@@ -32,6 +32,21 @@ export const getProducts = async (queryParams: any = {}) => {
   }
 };
 
+export const getPagedProducts = async (page: number = 1) => {
+  try {
+    const storeBaseUrl = process.env.STORE_BASE_URL;
+
+    const productsUrl = `${storeBaseUrl}/api/products/?page=${page}`;
+
+    const response = await axios.get(productsUrl);
+    const products = response.data.results;
+    const productsCount = response.data.count;
+    return {products, productsCount};
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  }
+};
+
 export const getProduct = async (productId: number) => {
   try {
     const storeBaseUrl = process.env.STORE_BASE_URL;

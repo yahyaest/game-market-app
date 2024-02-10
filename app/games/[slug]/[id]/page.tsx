@@ -424,7 +424,6 @@ export default async function GameInfo({ params }: Params) {
         if (searchGameProductInStore.length > 0) {
           const productId = searchGameProductInStore[0].id;
           const payload = {
-            usercustomer_namename: review.username,
             customer_email: review.email,
             customer_image: review.userImage,
             customer_name : review.username,

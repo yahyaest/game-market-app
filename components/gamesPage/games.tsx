@@ -10,7 +10,7 @@ import PaginationComponent from "@/components/gamesPage/pagination";
 const renderGamePlatform = (gamePlatforms: any[]) => {
   let platforms = [];
   for (const e of gamePlatforms) {
-    platforms.push(e.platform.slug);
+    platforms.push(e.platform ? e.platform.slug : e);
   }
 
   return (
@@ -26,9 +26,11 @@ const renderGamePlatform = (gamePlatforms: any[]) => {
 type Props = {
   getGames: (page: number) => Promise<any>;
   serverGamesResponse: any;
+  gameCount: number;
+  pageComponent: string
 };
 
-export default function GamesPage({ getGames, serverGamesResponse }: Props) {
+export default function GamesPage({ getGames, serverGamesResponse, gameCount, pageComponent }: Props) {
   const router = useRouter();
   const [currentGames, setCurrentGames] = useState(serverGamesResponse.results);
   const bgColors = [
@@ -61,35 +63,35 @@ export default function GamesPage({ getGames, serverGamesResponse }: Props) {
               <CardHeader className="pb-0 pt-2 px-4 flex-col">
                 <div className="grid grid-cols-2 gap-20 justify-items-stretch align-items-center">
                   <div className="justify-self-start flex flex-raw gap-2 pt-2 text-tiny uppercase font-bold">
-                    {renderGamePlatform(game.parent_platforms)}
+                    {renderGamePlatform(game.parent_platforms || game.external_args.platforms)}
                   </div>
                   <div className="justify-self-end pb-2">
-                    {game.metacritic && (
+                    {(game.metacritic || game.external_args?.metacritic) && (
                       <Chip color="warning" variant="shadow">
-                        {game.metacritic}
+                        {(game.metacritic || game.external_args.metacritic)}
                       </Chip>
                     )}
                   </div>
                 </div>
                 <h4
                   className={`${
-                    game.name.length <= 20
+                    (game.name || game.title).length <= 20
                       ? "font-bold text-large"
-                      : game.name.length <= 30
+                      : (game.name || game.title).length <= 30
                       ? "font-bold text-[0.85rem]"
-                      : game.name.length <= 45
+                      : (game.name || game.title).length <= 45
                       ? "font-bold text-[0.8rem]"
                       : "font-bold text-[0.7rem]"
                   } h-8 `}
                 >
-                  {game.name}
+                  {game.name || game.title}
                 </h4>
               </CardHeader>
               <CardBody className="overflow-visible py-2 mx-3">
                 <Image
-                  alt={game.name}
+                  alt={game.name || game.title}
                   className="object-cover rounded-xl h-36"
-                  src={game.background_image}
+                  src={game.background_image || game.external_args.background_image}
                   width={270}
                 />
               </CardBody>
@@ -99,8 +101,10 @@ export default function GamesPage({ getGames, serverGamesResponse }: Props) {
       </div>
       <PaginationComponent
         serverGamesResponse={serverGamesResponse}
+        gameCount={gameCount}
         getGames={getGames}
         setCurrentGames={setCurrentGames}
+        pageComponent={pageComponent}
       />
     </div>
   );
