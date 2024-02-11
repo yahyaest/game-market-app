@@ -7,6 +7,8 @@ export interface Product {
   description: string;
   inventory: number;
   price: number;
-  collection_id : number;
-  external_args : any
+  collection_id: number;
+  external_args: any;
+  tags?: string[];
+  promotions?: { discount: number; expire_at: string }[];
 }

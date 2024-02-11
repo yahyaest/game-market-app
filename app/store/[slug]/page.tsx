@@ -13,6 +13,7 @@ import {
   getProductReviews,
   postReview,
 } from "@/services/store";
+import GameStore from "@/components/gameInfoPage/gameStore";
 
 type Params = {
   params: {
@@ -85,6 +86,7 @@ export default async function ProductStore({ params }: Params) {
         </div>
         <div className="w-full lg:w-1/3 mx-2">
           <GameTrailer videoTrailer={product.external_args.youtube_trailer} />
+          <GameStore product={product}/>
           <GameScreenshot screenshots={productImages} />
         </div>
       </div>
