@@ -17,12 +17,14 @@ export const getProducts = async (queryParams: any = {}) => {
   try {
     const storeBaseUrl = process.env.STORE_BASE_URL;
     const queryString = Object.keys(queryParams)
-    .map(
-      (key) =>
-      `${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`
+      .map(
+        (key) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`
       )
       .join("&");
-    const productsUrl = `${storeBaseUrl}/api/products/${queryString ? `?${queryString}` : ''}`;
+    const productsUrl = `${storeBaseUrl}/api/products/${
+      queryString ? `?${queryString}` : ""
+    }`;
 
     const response = await axios.get(productsUrl);
     const products = response.data.results;
@@ -41,7 +43,7 @@ export const getPagedProducts = async (page: number = 1) => {
     const response = await axios.get(productsUrl);
     const products = response.data.results;
     const productsCount = response.data.count;
-    return {products, productsCount};
+    return { products, productsCount };
   } catch (error) {
     console.error("Error fetching products:", error);
   }
@@ -56,6 +58,30 @@ export const getProduct = async (productId: number) => {
     return product.data;
   } catch (error) {
     console.error("Error fetching product:", error);
+  }
+};
+
+export const getProductImages = async (productId: number) => {
+  try {
+    const storeBaseUrl = process.env.STORE_BASE_URL;
+    const productsUrl = `${storeBaseUrl}/api/products/${productId}/images/`;
+
+    const product = await axios.get(productsUrl);
+    return product.data.results;
+  } catch (error) {
+    console.error("Error fetching product images:", error);
+  }
+};
+
+export const getProductReviews = async (productId: number) => {
+  try {
+    const storeBaseUrl = process.env.STORE_BASE_URL;
+    const productsUrl = `${storeBaseUrl}/api/products/${productId}/reviews/`;
+
+    const product = await axios.get(productsUrl);
+    return product.data.results;
+  } catch (error) {
+    console.error("Error fetching product reviews:", error);
   }
 };
 
@@ -77,7 +103,11 @@ export const postProduct = async (token: string, payload: any) => {
   }
 };
 
-export const updateProduct = async (token: string, productId: number, payload: any) => {
+export const updateProduct = async (
+  token: string,
+  productId: number,
+  payload: any
+) => {
   try {
     const storeBaseUrl = process.env.STORE_BASE_URL;
     const productsUrl = `${storeBaseUrl}/api/products/${productId}/`;
@@ -98,7 +128,7 @@ export const updateProduct = async (token: string, productId: number, payload: a
 export const postReview = async (token: string, payload: any) => {
   try {
     const storeBaseUrl = process.env.STORE_BASE_URL;
-    const productId = payload.product_id
+    const productId = payload.product_id;
     const reviewsUrl = `${storeBaseUrl}/api/products/${productId}/reviews/`;
 
     const options: any = {

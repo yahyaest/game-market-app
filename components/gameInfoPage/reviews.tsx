@@ -100,29 +100,33 @@ export default function Reviews({
             key={review.id}
             className={`${
               user
-                ? user.email === review.email
+                ? user.email === review.email ||
+                  user.email === review.customer_email
                   ? "transition ease-in-out delay-300 bg-red-700 hover:bg-red-600"
                   : "transition ease-in-out delay-300 bg-slate-700 hover:bg-slate-600"
                 : "transition ease-in-out delay-300 bg-slate-700 hover:bg-slate-600"
             } bg-opacity-20 hover:bg-opacity-25 rounded-xl p-4 my-5 space-y-2`}
           >
             <div className="flex flex-row space-x-3">
-              {review.userImage && (
+              {(review.userImage || review.customer_image) && (
                 <Avatar
-                  src={`${process.env.GATEWAY_BASE_URL}/${review.userImage}`}
+                  src={`${process.env.GATEWAY_BASE_URL}/${
+                    review.userImage || review.customer_image
+                  }`}
                 />
               )}
               <p className="text-amber-500 text-lg font-semibold">
-                {review.username}
-                {user ? (user.email === review.email ? " (me)" : null) : null}
+                {review.username || review.customer_name}
+                {user
+                  ? user.email === review.email ||
+                    user.email === review.customer_email
+                    ? " (me)"
+                    : null
+                  : null}
               </p>
             </div>
             <div className="flex flex-row space-x-3">
-              <Rating
-                value={review.rating}
-                disabled
-                cancel={false}
-              />
+              <Rating value={review.rating} disabled cancel={false} />
               {review.createdAt && (
                 <p className="text-slate-600 text-md font-medium">
                   {review.createdAt.toLocaleDateString("en-GB")}

@@ -27,10 +27,15 @@ type Props = {
   getGames: (page: number) => Promise<any>;
   serverGamesResponse: any;
   gameCount: number;
-  pageComponent: string
+  pageComponent: string;
 };
 
-export default function GamesPage({ getGames, serverGamesResponse, gameCount, pageComponent }: Props) {
+export default function GamesPage({
+  getGames,
+  serverGamesResponse,
+  gameCount,
+  pageComponent,
+}: Props) {
   const router = useRouter();
   const [currentGames, setCurrentGames] = useState(serverGamesResponse.results);
   const bgColors = [
@@ -53,7 +58,11 @@ export default function GamesPage({ getGames, serverGamesResponse, gameCount, pa
         {currentGames.map((game: any, index: number) => (
           <div
             key={game.id}
-            onClick={() => router.push(`/games/${game.slug}/${game.id}`)}
+            onClick={() =>
+              pageComponent === "games"
+                ? router.push(`/games/${game.slug}/${game.id}`)
+                : router.push(`/store/${game.slug}`)
+            }
           >
             <Card
               className={`${
@@ -63,12 +72,14 @@ export default function GamesPage({ getGames, serverGamesResponse, gameCount, pa
               <CardHeader className="pb-0 pt-2 px-4 flex-col">
                 <div className="grid grid-cols-2 gap-20 justify-items-stretch align-items-center">
                   <div className="justify-self-start flex flex-raw gap-2 pt-2 text-tiny uppercase font-bold">
-                    {renderGamePlatform(game.parent_platforms || game.external_args.platforms)}
+                    {renderGamePlatform(
+                      game.parent_platforms || game.external_args.platforms
+                    )}
                   </div>
                   <div className="justify-self-end pb-2">
                     {(game.metacritic || game.external_args?.metacritic) && (
                       <Chip color="warning" variant="shadow">
-                        {(game.metacritic || game.external_args.metacritic)}
+                        {game.metacritic || game.external_args.metacritic}
                       </Chip>
                     )}
                   </div>
@@ -91,7 +102,9 @@ export default function GamesPage({ getGames, serverGamesResponse, gameCount, pa
                 <Image
                   alt={game.name || game.title}
                   className="object-cover rounded-xl h-36"
-                  src={game.background_image || game.external_args.background_image}
+                  src={
+                    game.background_image || game.external_args.background_image
+                  }
                   width={270}
                 />
               </CardBody>

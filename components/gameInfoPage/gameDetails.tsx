@@ -1,13 +1,13 @@
 import parse from "html-react-parser";
 import { Button, Chip } from "@nextui-org/react";
 import {
- FaGamepad,
- FaPlaystation,
- FaXbox,
- FaWindows,
- FaAndroid,
- FaLinux,
- FaAppStoreIos,
+  FaGamepad,
+  FaPlaystation,
+  FaXbox,
+  FaWindows,
+  FaAndroid,
+  FaLinux,
+  FaAppStoreIos,
 } from "react-icons/fa";
 import { SiNintendo } from "react-icons/si";
 import { RiMacbookFill } from "react-icons/ri";
@@ -22,30 +22,30 @@ const FieldInfo = (props: { label: string; value: JSX.Element }) => {
 };
 
 const PlatformIcon = (props: { platform: string }) => {
- if (props.platform === "pc") {
-   return <FaWindows className="m-1" size={18} />;
- }
- if (props.platform === "linux") {
-   return <FaLinux className="m-1" size={18} />;
- }
- if (props.platform === "playstation") {
-   return <FaPlaystation className="m-1" size={18} />;
- }
- if (props.platform === "xbox") {
-   return <FaXbox className="m-1" size={18} />;
- }
- if (props.platform === "nintendo") {
-   return <SiNintendo className="m-1" size={18} />;
- }
- if (props.platform === "android") {
-   return <FaAndroid className="m-1" size={18} />;
- }
- if (props.platform === "ios") {
-   return <FaAppStoreIos className="m-1" size={18} />;
- }
- if (props.platform === "mac") {
-   return <RiMacbookFill className="m-1" size={18} />;
- } else return <FaGamepad className="m-1" size={18} />;
+  if (props.platform === "pc") {
+    return <FaWindows className="m-1" size={18} />;
+  }
+  if (props.platform === "linux") {
+    return <FaLinux className="m-1" size={18} />;
+  }
+  if (props.platform === "playstation") {
+    return <FaPlaystation className="m-1" size={18} />;
+  }
+  if (props.platform === "xbox") {
+    return <FaXbox className="m-1" size={18} />;
+  }
+  if (props.platform === "nintendo") {
+    return <SiNintendo className="m-1" size={18} />;
+  }
+  if (props.platform === "android") {
+    return <FaAndroid className="m-1" size={18} />;
+  }
+  if (props.platform === "ios") {
+    return <FaAppStoreIos className="m-1" size={18} />;
+  }
+  if (props.platform === "mac") {
+    return <RiMacbookFill className="m-1" size={18} />;
+  } else return <FaGamepad className="m-1" size={18} />;
 };
 
 type Props = {
@@ -63,7 +63,10 @@ export default function GameDetails({ gameInfo }: Props) {
           label={"About"}
           value={
             parse(
-              gameInfo.description_html.replace(/<\/p>/g, "</p><br>")
+              (gameInfo.description_html || gameInfo.description).replace(
+                /<\/p>/g,
+                "</p><br>"
+              )
             ) as any
           }
         />
@@ -72,34 +75,51 @@ export default function GameDetails({ gameInfo }: Props) {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <FieldInfo
           label={"Platforms"}
-          value={gameInfo.platforms.map((platform: string) => (
-            <Chip
-              key={platform}
-              startContent={<PlatformIcon platform={platform} />}
-              color="primary"
-              variant="shadow"
-              className="m-1"
-            >
-              {platform}
-            </Chip>
-          ))}
+          value={(gameInfo.platforms || gameInfo.external_args.platforms).map(
+            (platform: string) => (
+              <Chip
+                key={platform}
+                startContent={<PlatformIcon platform={platform} />}
+                color="primary"
+                variant="shadow"
+                className="m-1"
+              >
+                {platform}
+              </Chip>
+            )
+          )}
         />
         <FieldInfo
           label={"Genre"}
-          value={gameInfo.genres.map((genre: string) => (
-            <Chip key={genre} color="danger" variant="shadow" className="m-1">
-              {genre}
-            </Chip>
-          ))}
+          value={(gameInfo.genres || gameInfo.external_args.genres).map(
+            (genre: string) => (
+              <Chip key={genre} color="danger" variant="shadow" className="m-1">
+                {genre}
+              </Chip>
+            )
+          )}
         />
-        <FieldInfo label={"Developer"} value={gameInfo.developers.toString()} />
-        <FieldInfo label={"Publisher"} value={gameInfo.publishers.toString()} />
-        <FieldInfo label={"Release date"} value={gameInfo.released} />
+        <FieldInfo
+          label={"Developer"}
+          value={(
+            gameInfo.developers || gameInfo.external_args.developers
+          ).toString()}
+        />
+        <FieldInfo
+          label={"Publisher"}
+          value={(
+            gameInfo.publishers || gameInfo.external_args.publishers
+          ).toString()}
+        />
+        <FieldInfo
+          label={"Release date"}
+          value={gameInfo.released || gameInfo.external_args.released}
+        />
         <FieldInfo
           label={"Metascore"}
           value={
             <Chip color="warning" variant="shadow" className="m-1">
-              {gameInfo.metacritic}
+              {gameInfo.metacritic || gameInfo.external_args.metacritic}
             </Chip>
           }
         />
@@ -121,7 +141,9 @@ export default function GameDetails({ gameInfo }: Props) {
               radius="full"
               className="bg-gradient-to-tr from-red-500 to-blue-500 text-white shadow-lg w-36"
             >
-              <a href={gameInfo.website}>Visit</a>
+              <a href={gameInfo.website || gameInfo.external_args.website}>
+                Visit
+              </a>
             </Button>
           }
         />

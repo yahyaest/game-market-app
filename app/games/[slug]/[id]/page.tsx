@@ -11,7 +11,7 @@ import {
   updateProduct,
   postReview,
 } from "@/services/store";
-import { Chip } from "@nextui-org/react";
+import { Button, Chip } from "@nextui-org/react";
 import { User } from "@/models/user";
 import { Collection } from "@/models/collection";
 import AddToStore from "@/components/gameInfoPage/addToStore";
@@ -152,11 +152,11 @@ export default async function GameInfo({ params }: Params) {
     }
   };
 
-  const getGameYouTubeTrailer = async(gameTitle : string) =>{
+  const getGameYouTubeTrailer = async (gameTitle: string) => {
     "use server";
     const videoResult = await ytSearch(`${gameTitle} Trailer`);
-    return videoResult.items[0]
-}
+    return videoResult.items[0];
+  };
 
   const addGameToMarket = async (gameInfo: Game) => {
     try {
@@ -243,14 +243,15 @@ export default async function GameInfo({ params }: Params) {
     try {
       console.log(`Adding game ${gameInfo.title} to store`);
 
-      const gameYouTubeTrailer = await getGameYouTubeTrailer(gameInfo.title) as any
+      const gameYouTubeTrailer = (await getGameYouTubeTrailer(
+        gameInfo.title
+      )) as any;
       const youtubeTrailer = {
         title: gameYouTubeTrailer.title,
         videoId: gameYouTubeTrailer.id,
         url: gameYouTubeTrailer.url,
-        thumbnail: gameYouTubeTrailer.bestThumbnail.url
-        
-      }
+        thumbnail: gameYouTubeTrailer.bestThumbnail.url,
+      };
 
       const externalArgs = {
         metacritic: gameInfo.metacritic,
@@ -266,7 +267,7 @@ export default async function GameInfo({ params }: Params) {
         developers: gameInfo.developers,
         genres: gameInfo.genres,
         publishers: gameInfo.publishers,
-        youtube_trailer: youtubeTrailer
+        youtube_trailer: youtubeTrailer,
       };
 
       const payload = {
@@ -293,40 +294,42 @@ export default async function GameInfo({ params }: Params) {
     const productsSearch: Product[] = await getProducts({
       slug: params.slug,
     });
-    if (productsSearch.length > 0 ) {
-      const product = productsSearch[0]
-      let productExternalArgs = product.external_args
+    if (productsSearch.length > 0) {
+      const product = productsSearch[0];
+      let productExternalArgs = product.external_args;
 
-      if(!productExternalArgs["youtube_trailer"]){
-        console.log(`Add trailer to Product ${product.title}`)
-        const gameYouTubeTrailer = await getGameYouTubeTrailer(product.title) as any
+      if (!productExternalArgs["youtube_trailer"]) {
+        console.log(`Add trailer to Product ${product.title}`);
+        const gameYouTubeTrailer = (await getGameYouTubeTrailer(
+          product.title
+        )) as any;
         const youtubeTrailer = {
-        title: gameYouTubeTrailer.title,
-        videoId: gameYouTubeTrailer.id,
-        url: gameYouTubeTrailer.url,
-        thumbnail: gameYouTubeTrailer.bestThumbnail.url
+          title: gameYouTubeTrailer.title,
+          videoId: gameYouTubeTrailer.id,
+          url: gameYouTubeTrailer.url,
+          thumbnail: gameYouTubeTrailer.bestThumbnail.url,
+        };
+        productExternalArgs["youtube_trailer"] = youtubeTrailer;
+        return updateProduct(token, product.id, {
+          external_args: productExternalArgs,
+        });
+      } else {
+        console.log(`Product ${product.title} has a trailer already`);
       }
-      productExternalArgs["youtube_trailer"] = youtubeTrailer
-      return updateProduct(token, product.id, {external_args : productExternalArgs})
-      }
-      else{
-        console.log(`Product ${product.title} has a trailer already`)
-      }
-    }
-    else{
-      console.log(`Product ${params.slug} not found`)
+    } else {
+      console.log(`Product ${params.slug} not found`);
     }
   };
 
   const getGameReviews = async () => {
-      const searchGame = await db
-        .select()
-        .from(games)
-        .where(eq(games.slug, params.slug));
+    const searchGame = await db
+      .select()
+      .from(games)
+      .where(eq(games.slug, params.slug));
 
-      const gameId = searchGame[0].id;
+    const gameId = searchGame[0].id;
 
-      return await db.select().from(reviews).where(eq(reviews.gameId, gameId));
+    return await db.select().from(reviews).where(eq(reviews.gameId, gameId));
   };
 
   const checkUserHasReview = async () => {
@@ -380,7 +383,7 @@ export default async function GameInfo({ params }: Params) {
           const payload = {
             customer_email: review.email,
             customer_image: review.userImage,
-            customer_name : review.username,
+            customer_name: review.username,
             comment: review.comment,
             rating: review.rating,
             product_id: productId,
@@ -397,7 +400,7 @@ export default async function GameInfo({ params }: Params) {
 
   constructorObject = await pageConstructor(constructorObject);
   const gameInfo = await getGameInfo(id);
-  const gameTrailer = await getGameYouTubeTrailer(gameInfo?.title)
+  const gameTrailer = await getGameYouTubeTrailer(gameInfo?.title);
   await addGameToMarket(gameInfo as Game);
   const gameReviews = await getGameReviews();
   const isUserGameReview = await checkUserHasReview();
@@ -412,10 +415,10 @@ export default async function GameInfo({ params }: Params) {
     >
       <div className="flex flex-col lg:flex-row">
         <div className="w-full lg:w-2/3 mx-2">
-          <GameDetails gameInfo={gameInfo}/>
+          <GameDetails gameInfo={gameInfo} />
         </div>
         <div className="w-full lg:w-1/3 mx-2">
-          <GameTrailer videoTrailer={gameTrailer}/>
+          <GameTrailer videoTrailer={gameTrailer} />
           <GameScreenshot screenshots={gameInfo.screenshots} />
           <div className="flex flex-row justify-center align-middle my-3 space-x-3">
             {user ? (
@@ -448,6 +451,14 @@ export default async function GameInfo({ params }: Params) {
               )
             ) : (
               <></>
+            )}
+            {constructorObject?.isGameInStore && (
+              <Button
+                radius="full"
+                className="bg-gradient-to-tr from-red-500 to-blue-500 text-white shadow-lg"
+              >
+                <a href={`/store/${params.slug}`}>Go To Store</a>
+              </Button>
             )}
           </div>
         </div>
