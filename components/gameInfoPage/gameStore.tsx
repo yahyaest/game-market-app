@@ -83,7 +83,7 @@ export default function GameStore({ product }: Props) {
       (product.price * (product.promotions?.[0]?.discount ?? 0)) / 100
     : product.price;
   return (
-    <div className="flex flex-col justify-center">
+    <div className="flex flex-col justify-center transition ease-in-out delay-300 bg-slate-700 hover:bg-slate-600 bg-opacity-40 hover:bg-opacity-45 rounded-xl p-4 my-5">
       <h1 className="text-xl text-center font-bold text-red-500 mb-3">
         Buy from this Store
       </h1>
