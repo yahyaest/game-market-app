@@ -1,4 +1,5 @@
 import React from "react";
+import { cookies } from "next/headers";
 import { Button, Chip } from "@nextui-org/react";
 import {
   FaPlaystation,
@@ -7,10 +8,12 @@ import {
   FaGooglePlay,
   FaAppStoreIos,
   FaStore,
-  FaCartPlus,
 } from "react-icons/fa6";
 import { SiNintendo } from "react-icons/si";
 import { Product } from "@/models/product";
+import AddToCart from "./addToCart";
+import { postCart, postCartItem, updateProduct } from "@/services/store";
+import { getToken } from "@/services/gateway";
 
 const StoreIcon = (props: { store: string }) => {
   if (props.store === "PlayStation Store") {
@@ -74,6 +77,27 @@ type Props = {
 };
 
 export default function GameStore({ product }: Props) {
+  const postOrUpdateCart = async (quantity: number) => {
+    "use server";
+    let cart = null;
+    const cartId = cookies().get("cartId")?.value as string;
+    console.log("cartId", cartId);
+    if (!cartId) {
+      cart = await postCart();
+      cookies().set("cartId", cart.id)
+    }
+    const cartItemPayload = {
+      cart_id: cartId ? cartId : cart.id,
+      product_id: product.id,
+      quantity,
+    };
+    const cartItem = await postCartItem(cartItemPayload);
+    const appEmail = process.env.APP_USER_EMAIL as string;
+    const appPassword = process.env.APP_USER_PASSWORD as string;
+    const appToken = await getToken(appEmail, appPassword);
+    await updateProduct(appToken, product.id, {inventory : product.inventory - quantity});
+  };
+
   const isPromotionValid =
     product.promotions?.length > 0
       ? isPromotionNotExpired(product.promotions[0].expire_at.split("T")[0])
@@ -134,14 +158,11 @@ export default function GameStore({ product }: Props) {
           </Chip>
         </div>
         {product.inventory > 0 ? (
-          <Button
-            className="w-96 my-1"
-            color="danger"
-            endContent={<FaCartPlus />}
-          >
-            Add To Cart
-            {/* <a href={store.url}>{store.name}</a> */}
-          </Button>
+          <AddToCart
+            postOrUpdateCart={postOrUpdateCart}
+            gameInventory={product.inventory}
+            gamePrice={productPriceAfterDiscount}
+          />
         ) : (
           <></>
         )}

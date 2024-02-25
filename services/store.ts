@@ -143,3 +143,28 @@ export const postReview = async (token: string, payload: any) => {
     console.error("Error post review:", error);
   }
 };
+
+export const postCart = async (payload={}) => {
+  try {
+    const storeBaseUrl = process.env.STORE_BASE_URL;
+    const cartsUrl = `${storeBaseUrl}/api/carts/`;
+
+    const cart = await axios.post(cartsUrl, payload);
+    return cart.data;
+  } catch (error) {
+    console.error("Error post cart:", error);
+  }
+};
+
+export const postCartItem = async (payload: any) => {
+  try {
+    const storeBaseUrl = process.env.STORE_BASE_URL;
+    const cartId = payload.cart_id;
+    const cartItemsUrl = `${storeBaseUrl}/api/carts/${cartId}/items/`;
+
+    const cartItem = await axios.post(cartItemsUrl, payload);
+    return cartItem.data;
+  } catch (error) {
+    console.error("Error post cart item:", error);
+  }
+};
