@@ -13,7 +13,7 @@ import {
   getProductReviews,
   postReview,
 } from "@/services/store";
-import GameStore from "@/components/gameInfoPage/gameStore";
+import GameStore from "@/components/storePage/gameStore";
 
 type Params = {
   params: {

@@ -144,6 +144,18 @@ export const postReview = async (token: string, payload: any) => {
   }
 };
 
+export const getCart = async (cartId:string) => {
+  try {
+    const storeBaseUrl = process.env.STORE_BASE_URL;
+    const cartsUrl = `${storeBaseUrl}/api/carts/${cartId}`;
+
+    const cart = await axios.get(cartsUrl);
+    return cart.data;
+  } catch (error) {
+    console.error("Error get cart:", error);
+  }
+};
+
 export const postCart = async (payload={}) => {
   try {
     const storeBaseUrl = process.env.STORE_BASE_URL;
