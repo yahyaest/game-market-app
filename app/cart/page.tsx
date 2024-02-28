@@ -12,15 +12,15 @@ export default async function Store() {
     <div className="flex min-h-screen flex-col p-4 md:p-16">
       {cartId ? (
         <div>
-          <h1 className="text-center text-amber-600 text-3xl font-bold">
+          <h1 className="text-center text-amber-600 text-3xl font-bold my-5">
             Cart with {cart.items_count} Games
           </h1>
           <CartTable cart={cart} />
-          <div className="flex flex-row my-5 space-x-2">
-            <Chip color="primary" variant="shadow">
+          <div className="flex flex-col sm:flex-row sm:space-x-2 my-5">
+            <Chip color="primary" variant="shadow" className="my-2">
               Total Price : {cart.total_price} $
             </Chip>
-            <Chip color="secondary" variant="shadow">
+            <Chip color="secondary" variant="shadow" className="my-2">
               Total Price After Discount : {cart.total_price_after_discount} $
             </Chip>
           </div>

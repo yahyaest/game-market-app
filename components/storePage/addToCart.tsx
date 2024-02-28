@@ -11,17 +11,18 @@ import {
   Input,
   Chip,
 } from "@nextui-org/react";
-
 import { FaCartPlus } from "react-icons/fa6";
 
 type Props = {
   postOrUpdateCart: (quantity: number) => Promise<any>;
+  addNotification: (quantity: number) => Promise<any>;
   gameInventory: number;
   gamePrice: number;
 };
 
 export default function AddToCart({
   postOrUpdateCart,
+  addNotification,
   gameInventory,
   gamePrice,
 }: Props) {
@@ -89,7 +90,10 @@ export default function AddToCart({
                 <Button
                   color="primary"
                   onPress={onClose}
-                  onClick={() => postOrUpdateCart(quantity)}
+                  onClick={() => {
+                    postOrUpdateCart(quantity);
+                    addNotification(quantity);
+                  }}
                 >
                   Submit
                 </Button>

@@ -14,6 +14,9 @@ import { Product } from "@/models/product";
 import AddToCart from "./addToCart";
 import { postCart, postCartItem, updateProduct } from "@/services/store";
 import { getToken } from "@/services/gateway";
+import { addUserNotification } from "@/services/notification";
+import { User } from "@/models/user";
+import { Notification } from "@/models/notification";
 
 const StoreIcon = (props: { store: string }) => {
   if (props.store === "PlayStation Store") {
@@ -98,6 +101,25 @@ export default function GameStore({ product }: Props) {
     await updateProduct(appToken, product.id, {inventory : product.inventory - quantity});
   };
 
+  const addNotification = async (quantity: number) => {
+    "use server";
+    const user: User = JSON.parse(cookies().get("user")?.value as string);
+    const cartId = cookies().get("cartId")?.value as string;
+    if (!user) return;
+    const notificationPayload: Notification = {
+      message: `Adding ${quantity} ${product.title} ${
+        quantity > 1 ? "games" : "game"
+      } to cart`,
+      sender: user.email,
+      title: cartId ? "Cart Updated" : "Cart Created",
+      userId: user.id,
+      username: user.username,
+      userEmail: user.email,
+      userImage: user.avatarUrl as string,
+    };
+    return addUserNotification(notificationPayload);
+  };
+
   const isPromotionValid =
     product.promotions?.length > 0
       ? isPromotionNotExpired(product.promotions[0].expire_at.split("T")[0])
@@ -160,6 +182,7 @@ export default function GameStore({ product }: Props) {
         {product.inventory > 0 ? (
           <AddToCart
             postOrUpdateCart={postOrUpdateCart}
+            addNotification={addNotification}
             gameInventory={product.inventory}
             gamePrice={productPriceAfterDiscount}
           />

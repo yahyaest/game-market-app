@@ -9,6 +9,7 @@ export interface Product {
   price: number;
   collection_id: number;
   external_args: any;
+  background_image?: string;
   tags?: string[];
   promotions?: { discount: number; expire_at: string }[];
 }

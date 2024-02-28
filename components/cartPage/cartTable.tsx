@@ -7,10 +7,8 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  User,
-  Chip,
   Tooltip,
-  getKeyValue,
+  Avatar,
 } from "@nextui-org/react";
 import { Cart, CartItem } from "@/models/cart";
 
@@ -21,59 +19,6 @@ const columns = [
   { name: "TOTAL PRICE", uid: "total price" },
   { name: "TOTAL PRICE AFTER DISCOUNT", uid: "total price after discount" },
   { name: "ACTIONS", uid: "actions" },
-];
-
-const users = [
-  {
-    id: 1,
-    name: "Tony Reichert",
-    role: "CEO",
-    team: "Management",
-    status: "active",
-    age: "29",
-    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-    email: "tony.reichert@example.com",
-  },
-  {
-    id: 2,
-    name: "Zoey Lang",
-    role: "Technical Lead",
-    team: "Development",
-    status: "paused",
-    age: "25",
-    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-    email: "zoey.lang@example.com",
-  },
-  {
-    id: 3,
-    name: "Jane Fisher",
-    role: "Senior Developer",
-    team: "Development",
-    status: "active",
-    age: "22",
-    avatar: "https://i.pravatar.cc/150?u=a04258114e29026702d",
-    email: "jane.fisher@example.com",
-  },
-  {
-    id: 4,
-    name: "William Howard",
-    role: "Community Manager",
-    team: "Marketing",
-    status: "vacation",
-    age: "28",
-    avatar: "https://i.pravatar.cc/150?u=a048581f4e29026701d",
-    email: "william.howard@example.com",
-  },
-  {
-    id: 5,
-    name: "Kristen Copper",
-    role: "Sales Manager",
-    team: "Sales",
-    status: "active",
-    age: "24",
-    avatar: "https://i.pravatar.cc/150?u=a092581d4ef9026700d",
-    email: "kristen.cooper@example.com",
-  },
 ];
 
 const EditIcon = () => (
@@ -202,7 +147,15 @@ export default function CartTable({ cart }: Props) {
   const renderCell = (cartItem: CartItem, columnKey: string) => {
     switch (columnKey) {
       case "name":
-        return <div>{cartItem.product.title}</div>;
+        return (
+          <div className="flex flex-row space-x-3">
+            <Avatar
+              src={cartItem.product.background_image}
+              alt={cartItem.product.title}
+            />
+            <h1 className="mt-2">{cartItem.product.title} </h1>
+          </div>
+        );
       case "unit price":
         return <div>{cartItem.product.price} $</div>;
       case "quantity":
@@ -219,12 +172,12 @@ export default function CartTable({ cart }: Props) {
                 <EyeIcon />
               </span>
             </Tooltip>
-            <Tooltip content="Edit user">
+            <Tooltip content="Edit cart item">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip color="danger" content="Delete user">
+            <Tooltip color="danger" content="Delete cart item">
               <span className="text-lg text-danger cursor-pointer active:opacity-50">
                 <DeleteIcon />
               </span>
@@ -232,7 +185,7 @@ export default function CartTable({ cart }: Props) {
           </div>
         );
       default:
-        return cellValue;
+        return <div></div>;
     }
   };
 
