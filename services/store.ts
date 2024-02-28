@@ -194,6 +194,18 @@ export const postCartItem = async (payload: any) => {
   }
 };
 
+export const updateCartItem = async (cartId: string, cartItemId: string, payload: any) => {
+  try {
+    const storeBaseUrl = process.env.STORE_BASE_URL;
+    const cartItemsUrl = `${storeBaseUrl}/api/carts/${cartId}/items/${cartItemId}/`;
+
+    const cartItem = await axios.patch(cartItemsUrl, payload);
+    return cartItem.data;
+  } catch (error) {
+    console.error("Error update cart item:", error);
+  }
+};
+
 export const deleteCartItem = async (cartId: string, cartItemId: string) => {
   try {
     const storeBaseUrl = process.env.STORE_BASE_URL;

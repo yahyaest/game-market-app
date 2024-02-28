@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { Chip } from "@nextui-org/react";
 import CartTable from "@/components/cartPage/cartTable";
 import CartActions from "@/components/cartPage/cartActions";
-import { deleteCart, getCart, deleteCartItem } from "@/services/store";
+import { getCart, deleteCart, updateCartItem, deleteCartItem } from "@/services/store";
 import { addUserNotification } from "@/services/notification";
 import { Cart } from "@/models/cart";
 import { User } from "@/models/user";
@@ -25,6 +25,13 @@ export default async function Cart() {
     const cartId = cookies().get("cartId")?.value as string;
     if (!cartId) return;
     await deleteCartItem(cartId, cartItemId);
+  };
+
+  const updateProductsCartItem = async (cartItemId: string, payload:{quantity:number}) => {
+    "use server";
+    const cartId = cookies().get("cartId")?.value as string;
+    if (!cartId) return;
+    await updateCartItem(cartId, cartItemId, payload);
   };
 
   const removeCartNotification = async () => {
@@ -53,6 +60,7 @@ export default async function Cart() {
           </h1>
           <CartTable
             cart={cart}
+            updateProductsCartItem={updateProductsCartItem}
             deleteProductsCartItem={deleteProductsCartItem}
           />
           <div className="flex flex-col sm:flex-row sm:space-x-2 my-5">

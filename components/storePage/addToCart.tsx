@@ -90,6 +90,7 @@ export default function AddToCart({
                 <Button
                   color="primary"
                   onPress={onClose}
+                  isDisabled={quantity > gameInventory}
                   onClick={() => {
                     postOrUpdateCart(quantity);
                     addNotification(quantity);

@@ -103,12 +103,13 @@ export default function GameStore({ product }: Props) {
     // Update product inventory
     // TODO : update should be done when submetting the order not when adding to cart. Move it order page
     // TODO : If order failed/canceled, inventory should be updated back to the original value
-    const appEmail = process.env.APP_USER_EMAIL as string;
-    const appPassword = process.env.APP_USER_PASSWORD as string;
-    const appToken = await getToken(appEmail, appPassword);
-    await updateProduct(appToken, product.id, {
-      inventory: product.inventory - quantity,
-    });
+
+    // const appEmail = process.env.APP_USER_EMAIL as string;
+    // const appPassword = process.env.APP_USER_PASSWORD as string;
+    // const appToken = await getToken(appEmail, appPassword);
+    // await updateProduct(appToken, product.id, {
+    //   inventory: product.inventory - quantity,
+    // });
   };
 
   const addNotification = async (quantity: number) => {
