@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { Key } from "react";
 import {
   Table,
   TableHeader,
@@ -140,11 +140,12 @@ const statusColorMap = {
 };
 
 type Props = {
+  deleteProductsCartItem: (cartItemId: string) => Promise<any>;
   cart: Cart;
 };
 
-export default function CartTable({ cart }: Props) {
-  const renderCell = (cartItem: CartItem, columnKey: string) => {
+export default function CartTable({ cart, deleteProductsCartItem }: Props) {
+  const renderCell = (cartItem: CartItem, columnKey: Key) => {
     switch (columnKey) {
       case "name":
         return (
@@ -178,7 +179,12 @@ export default function CartTable({ cart }: Props) {
               </span>
             </Tooltip>
             <Tooltip color="danger" content="Delete cart item">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <span
+                className="text-lg text-danger cursor-pointer active:opacity-50"
+                onClick={() => {
+                  deleteProductsCartItem(cartItem?.id as string);
+                }}
+              >
                 <DeleteIcon />
               </span>
             </Tooltip>

@@ -12,11 +12,17 @@ import {
 import { SiNintendo } from "react-icons/si";
 import { Product } from "@/models/product";
 import AddToCart from "./addToCart";
-import { postCart, postCartItem, updateProduct } from "@/services/store";
+import {
+  getCart,
+  postCart,
+  postCartItem,
+  updateProduct,
+} from "@/services/store";
 import { getToken } from "@/services/gateway";
 import { addUserNotification } from "@/services/notification";
 import { User } from "@/models/user";
 import { Notification } from "@/models/notification";
+import { Cart } from "@/models/cart";
 
 const StoreIcon = (props: { store: string }) => {
   if (props.store === "PlayStation Store") {
@@ -84,10 +90,9 @@ export default function GameStore({ product }: Props) {
     "use server";
     let cart = null;
     const cartId = cookies().get("cartId")?.value as string;
-    console.log("cartId", cartId);
     if (!cartId) {
       cart = await postCart();
-      cookies().set("cartId", cart.id)
+      cookies().set("cartId", cart.id);
     }
     const cartItemPayload = {
       cart_id: cartId ? cartId : cart.id,
@@ -95,23 +100,29 @@ export default function GameStore({ product }: Props) {
       quantity,
     };
     const cartItem = await postCartItem(cartItemPayload);
+    // Update product inventory
+    // TODO : update should be done when submetting the order not when adding to cart. Move it order page
+    // TODO : If order failed/canceled, inventory should be updated back to the original value
     const appEmail = process.env.APP_USER_EMAIL as string;
     const appPassword = process.env.APP_USER_PASSWORD as string;
     const appToken = await getToken(appEmail, appPassword);
-    await updateProduct(appToken, product.id, {inventory : product.inventory - quantity});
+    await updateProduct(appToken, product.id, {
+      inventory: product.inventory - quantity,
+    });
   };
 
   const addNotification = async (quantity: number) => {
     "use server";
     const user: User = JSON.parse(cookies().get("user")?.value as string);
     const cartId = cookies().get("cartId")?.value as string;
+    const cart: Cart = await getCart(cartId);
     if (!user) return;
     const notificationPayload: Notification = {
       message: `Adding ${quantity} ${product.title} ${
         quantity > 1 ? "games" : "game"
       } to cart`,
       sender: user.email,
-      title: cartId ? "Cart Updated" : "Cart Created",
+      title: cart && cart.items.length > 1 ? "Cart Updated" : "Cart Created",
       userId: user.id,
       username: user.username,
       userEmail: user.email,

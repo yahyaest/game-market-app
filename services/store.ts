@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Card } from '@nextui-org/react';
 
 export const getCollections = async () => {
   try {
@@ -144,7 +145,7 @@ export const postReview = async (token: string, payload: any) => {
   }
 };
 
-export const getCart = async (cartId:string) => {
+export const getCart = async (cartId: string) => {
   try {
     const storeBaseUrl = process.env.STORE_BASE_URL;
     const cartsUrl = `${storeBaseUrl}/api/carts/${cartId}`;
@@ -156,7 +157,7 @@ export const getCart = async (cartId:string) => {
   }
 };
 
-export const postCart = async (payload={}) => {
+export const postCart = async (payload = {}) => {
   try {
     const storeBaseUrl = process.env.STORE_BASE_URL;
     const cartsUrl = `${storeBaseUrl}/api/carts/`;
@@ -165,6 +166,18 @@ export const postCart = async (payload={}) => {
     return cart.data;
   } catch (error) {
     console.error("Error post cart:", error);
+  }
+};
+
+export const deleteCart = async (cartId: string) => {
+  try {
+    const storeBaseUrl = process.env.STORE_BASE_URL;
+    const cartsUrl = `${storeBaseUrl}/api/carts/${cartId}/`;
+
+    const cart = await axios.delete(cartsUrl);
+    return cart.data;
+  } catch (error) {
+    console.error("Error update cart:", error);
   }
 };
 
@@ -178,5 +191,17 @@ export const postCartItem = async (payload: any) => {
     return cartItem.data;
   } catch (error) {
     console.error("Error post cart item:", error);
+  }
+};
+
+export const deleteCartItem = async (cartId: string, cartItemId: string) => {
+  try {
+    const storeBaseUrl = process.env.STORE_BASE_URL;
+    const cartItemsUrl = `${storeBaseUrl}/api/carts/${cartId}/items/${cartItemId}/`;
+
+    const cart = await axios.delete(cartItemsUrl);
+    return cart.data;
+  } catch (error) {
+    console.error("Error delete cart item:", error);
   }
 };
