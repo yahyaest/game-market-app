@@ -74,6 +74,28 @@ export const getCurrentUser = async () => {
   }
 };
 
+export const getUserByEmail = async (email: string, token: string) => {
+	try {
+		// Token need to be of admin user
+    const gatewayBaseUrl = process.env.GATEWAY_BASE_URL;
+		const currentUserUrl = `${gatewayBaseUrl}/api/users/?email=${email}`;
+		if (!token) {
+			throw Error('No token was provided. Failed to get current user data');
+		}
+		const options: any = {
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
+		};
+		const response = await axios.get(currentUserUrl, options);
+		const user = response.data[0];
+		return user as User;
+	} catch (error) {
+		console.error('Error fetching current user:', error);
+		alert(error);
+	}
+};
+
 export const getUsers = async () => {
   try {
     const gatewayBaseUrl = process.env.GATEWAY_BASE_URL;
