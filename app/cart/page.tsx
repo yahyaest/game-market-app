@@ -3,7 +3,12 @@ import { cookies } from "next/headers";
 import { Chip } from "@nextui-org/react";
 import CartTable from "@/components/cartPage/cartTable";
 import CartActions from "@/components/cartPage/cartActions";
-import { getCart, deleteCart, updateCartItem, deleteCartItem } from "@/services/store";
+import {
+  getCart,
+  deleteCart,
+  updateCartItem,
+  deleteCartItem,
+} from "@/services/store";
 import { addUserNotification } from "@/services/notification";
 import { Cart } from "@/models/cart";
 import { User } from "@/models/user";
@@ -27,7 +32,10 @@ export default async function Cart() {
     await deleteCartItem(cartId, cartItemId);
   };
 
-  const updateProductsCartItem = async (cartItemId: string, payload:{quantity:number}) => {
+  const updateProductsCartItem = async (
+    cartItemId: string,
+    payload: { quantity: number }
+  ) => {
     "use server";
     const cartId = cookies().get("cartId")?.value as string;
     if (!cartId) return;
@@ -36,7 +44,7 @@ export default async function Cart() {
 
   const removeCartNotification = async () => {
     "use server";
-    const user: User = JSON.parse(cookies().get("user")?.value as string);
+    const user: User = cookies().get("user")?.value ? JSON.parse(cookies().get("user")?.value as string) : null;
     const cartId = cookies().get("cartId")?.value as string;
     if (!user || !cartId) return;
     const notificationPayload: Notification = {
@@ -65,10 +73,10 @@ export default async function Cart() {
           />
           <div className="flex flex-col sm:flex-row sm:space-x-2 my-5">
             <Chip color="primary" variant="shadow" className="my-2">
-              Total Price : {cart.total_price} $
+              Total Price : {cart.total_price.toFixed(1)} $
             </Chip>
             <Chip color="secondary" variant="shadow" className="my-2">
-              Total Price After Discount : {cart.total_price_after_discount} $
+              Total Price After Discount : {cart.total_price_after_discount.toFixed(1)} $
             </Chip>
           </div>
           <CartActions

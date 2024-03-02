@@ -1,5 +1,6 @@
 "use client";
 import React, { Key } from "react";
+import { useRouter } from 'next/navigation';
 import {
   Table,
   TableHeader,
@@ -71,12 +72,6 @@ const DeleteIcon = () => (
   </svg>
 );
 
-const statusColorMap = {
-  active: "success",
-  paused: "danger",
-  vacation: "warning",
-};
-
 type Props = {
   updateProductsCartItem: (cartItemId: string, payload:{quantity:number}) => Promise<any>;
   deleteProductsCartItem: (cartItemId: string) => Promise<any>;
@@ -84,6 +79,8 @@ type Props = {
 };
 
 export default function CartTable({ cart, updateProductsCartItem, deleteProductsCartItem }: Props) {
+  const router = useRouter();
+
   const renderCell = (cartItem: CartItem, columnKey: Key) => {
     switch (columnKey) {
       case "name":
@@ -97,13 +94,13 @@ export default function CartTable({ cart, updateProductsCartItem, deleteProducts
           </div>
         );
       case "unit price":
-        return <div>{cartItem.product.price} $</div>;
+        return <div>{cartItem.product.price.toFixed(1)} $</div>;
       case "quantity":
         return <div>{cartItem.quantity}</div>;
       case "total price":
-        return <div>{cartItem.total_price} $</div>;
+        return <div>{cartItem.total_price.toFixed(1)} $</div>;
       case "total price after discount":
-        return <div>{cartItem.total_price_after_discount} $</div>;
+        return <div>{cartItem.total_price_after_discount.toFixed(1)} $</div>;
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
@@ -122,6 +119,7 @@ export default function CartTable({ cart, updateProductsCartItem, deleteProducts
                 className="text-lg text-danger cursor-pointer active:opacity-50"
                 onClick={() => {
                   deleteProductsCartItem(cartItem?.id as string);
+                  router.refresh()
                 }}
               >
                 <DeleteIcon />

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from 'next/navigation';
 import {
   Modal,
   ModalContent,
@@ -64,6 +65,7 @@ export default function CartItemEdit({
 }: Props) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [quantity, setQuantity] = useState<number>(cartItem.quantity);
+  const router = useRouter();
 
   return (
     <>
@@ -120,6 +122,7 @@ export default function CartItemEdit({
                   onPress={() => {
                     updateProductsCartItem(`${cartItem.id}`, { quantity });
                     onClose();
+                    router.refresh();
                   }}
                   isDisabled={quantity > cartItem.product.inventory}
                 >

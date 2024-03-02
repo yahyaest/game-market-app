@@ -114,7 +114,7 @@ export default function GameStore({ product }: Props) {
 
   const addNotification = async (quantity: number) => {
     "use server";
-    const user: User = JSON.parse(cookies().get("user")?.value as string);
+    const user: User = cookies().get("user")?.value ? JSON.parse(cookies().get("user")?.value as string) : null;
     const cartId = cookies().get("cartId")?.value as string;
     const cart: Cart = await getCart(cartId);
     if (!user) return;
