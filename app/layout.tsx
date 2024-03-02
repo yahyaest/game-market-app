@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
 import Header from "./header";
+import AppNavbar from "./navbar";
 import { Providers } from "./providers";
 import { Session, getServerSession } from "next-auth";
 import { and, eq } from "drizzle-orm";
@@ -59,7 +60,8 @@ export default async function RootLayout({
   return (
     <html lang="en" className="dark text-foreground bg-background">
       <body className={`dark text-foreground bg-background ${inter.className}`}>
-        <Header session={session} />
+        <AppNavbar session={session} />
+        {/* <Header session={session} /> */}
         <Providers session={session}>{children}</Providers>
       </body>
     </html>

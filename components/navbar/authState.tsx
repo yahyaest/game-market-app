@@ -1,5 +1,5 @@
 "use client";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { signOut } from "next-auth/react";
@@ -22,21 +22,22 @@ export default function AuthState({ session, token }: Props) {
 
   return (
     <>
-      {session || userToken || isUser   ? (
-        <Button
-          className="w-36"
-          color="primary"
-          variant="shadow"
-          onClick={() => {
-            session ? signOut() : logout();
-            session ? Cookies.remove("authProvider") : null
-            setIsUser(false);
-            setUserToken("");
-            setAvatarUrl("")
-          }}
-        >
-          Sign Out
-        </Button>
+      {session || userToken || isUser ? (
+        // <Button
+        //   className="w-36"
+        //   color="primary"
+        //   variant="shadow"
+        //   onClick={() => {
+        //     session ? signOut() : logout();
+        //     session ? Cookies.remove("authProvider") : null
+        //     setIsUser(false);
+        //     setUserToken("");
+        //     setAvatarUrl("")
+        //   }}
+        // >
+        //   Sign Out
+        // </Button>
+        <></>
       ) : (
         <Button
           className="w-36"
