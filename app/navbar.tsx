@@ -85,7 +85,7 @@ async function AppNavbar({ session }: Props) {
     : false;
 
   return (
-    <Navbar isBordered>
+    <Navbar isBordered  className="hidden sm:flex">
       <NavbarContent justify="start">
         <NavbarBrand className="mr-4">
           <AcmeLogo />
