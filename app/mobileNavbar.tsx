@@ -14,7 +14,14 @@ import {
   Link,
 } from "@nextui-org/react";
 import Avatar from "@/components/navbar/userAvatar";
-import AuthState from "@/components/navbar/authState";
+// import AuthState from "@/components/navbar/authState";
+
+// Prevent AuthState component from being server-side rendered to resolve the hydration issue.
+// The hydration issue often occurs when there is a mismatch between the HTML generated on the server and the HTML expected on the client side during the hydration process.
+import dynamic from 'next/dynamic'
+const AuthState = dynamic(() => import("@/components/navbar/authState"), {
+    ssr: false,
+})
 
 const AcmeLogo = () => (
   <svg fill="none" height="36" viewBox="0 0 32 32" width="36">
@@ -59,11 +66,10 @@ export default function AppMobileNavbar({ session }: Props) {
   const [isValidImage, setIsValidImage] = React.useState(false);
 
   const token = Cookies.get("token");
-  const user = Cookies.get("user");
-  const userImage = user ? JSON.parse(user).avatarUrl : null;
-
+  
   useEffect(() => {
     const fetchData = async () => {
+      const user = Cookies.get("user");
       const userImage = user ? JSON.parse(user).avatarUrl : null;
       const isImage = session
         ? await checkImage(session.user?.image!)
