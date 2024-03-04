@@ -44,7 +44,9 @@ export default async function Cart() {
 
   const removeCartNotification = async () => {
     "use server";
-    const user: User = cookies().get("user")?.value ? JSON.parse(cookies().get("user")?.value as string) : null;
+    const user: User = cookies().get("user")?.value
+      ? JSON.parse(cookies().get("user")?.value as string)
+      : null;
     const cartId = cookies().get("cartId")?.value as string;
     if (!user || !cartId) return;
     const notificationPayload: Notification = {
@@ -76,7 +78,8 @@ export default async function Cart() {
               Total Price : {cart.total_price.toFixed(1)} $
             </Chip>
             <Chip color="secondary" variant="shadow" className="my-2">
-              Total Price After Discount : {cart.total_price_after_discount.toFixed(1)} $
+              Total Price After Discount :
+              {cart.total_price_after_discount.toFixed(1)} $
             </Chip>
           </div>
           <CartActions

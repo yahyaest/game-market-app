@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Modal,
   ModalContent,
@@ -28,6 +29,7 @@ export default function AddToCart({
 }: Props) {
   const [quantity, setQuantity] = useState(1);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const router = useRouter();
 
   return (
     <div className="text-center w-full">
@@ -91,9 +93,10 @@ export default function AddToCart({
                   color="primary"
                   onPress={onClose}
                   isDisabled={quantity > gameInventory}
-                  onClick={() => {
-                    postOrUpdateCart(quantity);
-                    addNotification(quantity);
+                  onClick={async() => {
+                    await postOrUpdateCart(quantity);
+                    await addNotification(quantity);
+                    router.refresh();
                   }}
                 >
                   Submit

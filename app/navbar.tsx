@@ -2,6 +2,8 @@ import React from "react";
 import { cookies } from "next/headers";
 import { getServerSession } from "next-auth";
 import axios from "axios";
+import Avatar from "@/components/navbar/userAvatar";
+import AuthState from "@/components/navbar/authState";
 import {
   Navbar,
   NavbarBrand,
@@ -9,9 +11,12 @@ import {
   NavbarItem,
   Link,
   Input,
+  Badge,
+  Tooltip,
 } from "@nextui-org/react";
-import Avatar from "@/components/navbar/userAvatar";
-import AuthState from "@/components/navbar/authState";
+import { FaCartShopping } from "react-icons/fa6";
+import { Cart } from "@/models/cart";
+import { getCart } from "@/services/store";
 
 const AcmeLogo = () => (
   <svg fill="none" height="36" viewBox="0 0 32 32" width="36">
@@ -75,6 +80,7 @@ const checkImage = async (url: string) => {
 async function AppNavbar({ session }: Props) {
   const token = cookies().get("token")?.value;
   const user = cookies().get("user")?.value as any;
+  const cartId = cookies().get("cartId")?.value as string;
 
   const userImage = user ? JSON.parse(user).avatarUrl : null;
 
@@ -84,8 +90,10 @@ async function AppNavbar({ session }: Props) {
     ? await checkImage(userImage)
     : false;
 
+  const cart: Cart = await getCart(cartId);
+
   return (
-    <Navbar isBordered  className="hidden sm:flex">
+    <Navbar isBordered className="hidden sm:flex">
       <NavbarContent justify="start">
         <NavbarBrand className="mr-4">
           <AcmeLogo />
@@ -124,6 +132,28 @@ async function AppNavbar({ session }: Props) {
           startContent={<SearchIcon size={18} />}
           type="search"
         />
+        <Tooltip
+          content={
+            <div className="px-1 py-2">
+              <div className="text-small font-bold">Total Price</div>
+              <div className="text-tiny">
+                {cart ? cart.total_price_after_discount.toFixed(1) : 0} $
+              </div>
+            </div>
+          }
+        >
+          <Link href="/cart">
+            <Badge
+              color="warning"
+              content={cart?.items_count ? cart?.items_count : 0}
+              isInvisible={false}
+              shape="circle"
+              className="cursor-pointer"
+            >
+              <FaCartShopping className="w-9 text-gray-600" />
+            </Badge>
+          </Link>
+        </Tooltip>
         <Avatar session={session} isValidImage={isValidImage} />
         <AuthState session={session} token={token} />
       </NavbarContent>
