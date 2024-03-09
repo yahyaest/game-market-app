@@ -1,7 +1,15 @@
 import axios from "axios";
-import Cookies from "js-cookie";
 import { getToken, getUserByEmail } from "./gateway";
-import { cookies } from "next/headers";
+import Cookies from "js-cookie";
+let cookies : any;
+
+if (typeof window === 'undefined') {
+  // This code will only be executed on the server
+  cookies = require('next/headers').cookies;
+} else {
+  // This code will only be executed on the client
+  cookies = Cookies;
+}
 
 export const addUserNotification = async (payload: any) => {
   try {
@@ -80,7 +88,7 @@ export const getUserNotifications = async (email: string) => {
   try {
     const notificationBaseUrl = process.env.NOTIFICATION_BASE_URL;
     const notificationUrl = `${notificationBaseUrl}/api/notifications/?userEmail=${email}`;
-    const token = Cookies.get("token");
+    const token = Cookies.get("token") ? Cookies.get("token") : cookies().get("token")?.value;
     if (!token) {
       throw Error("No token was provided. Failed to post notification");
     }
@@ -106,7 +114,7 @@ export const updateNotification = async (
   try {
     const notificationBaseUrl = process.env.NOTIFICATION_BASE_URL;
     const notificationUrl = `${notificationBaseUrl}/api/notifications/${notificationId}`;
-    const token = Cookies.get("token");
+    const token = Cookies.get("token") ? Cookies.get("token") : cookies().get("token")?.value;
     if (!token) {
       throw Error("No token was provided. Failed to post notification");
     }
@@ -129,7 +137,7 @@ export const updateBulkNotification = async (payload: any) => {
   try {
     const notificationBaseUrl = process.env.NOTIFICATION_BASE_URL;
     const notificationUrl = `${notificationBaseUrl}/api/bulk_notifications`;
-    const token = Cookies.get("token");
+    const token = Cookies.get("token") ? Cookies.get("token") : cookies().get("token")?.value;
     if (!token) {
       throw Error("No token was provided. Failed to post notification");
     }
@@ -152,7 +160,7 @@ export const deleteNotification = async (notificationId: number) => {
   try {
     const notificationBaseUrl = process.env.NOTIFICATION_BASE_URL;
     const notificationUrl = `${notificationBaseUrl}/api/notifications/${notificationId}`;
-    const token = Cookies.get("token");
+    const token = Cookies.get("token") ? Cookies.get("token") : cookies().get("token")?.value;
     if (!token) {
       throw Error("No token was provided. Failed to post notification");
     }

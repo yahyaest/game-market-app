@@ -56,7 +56,7 @@ export default async function Cart() {
       userId: user.id,
       username: user.username,
       userEmail: user.email,
-      userImage: user.avatarUrl as string,
+      userImage: (user.avatarUrl as string).split('/')[3],
     };
     return addUserNotification(notificationPayload);
   };

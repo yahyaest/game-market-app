@@ -4,6 +4,12 @@ import { getServerSession } from "next-auth";
 import axios from "axios";
 import Avatar from "@/components/navbar/userAvatar";
 import AuthState from "@/components/navbar/authState";
+import NotificationIcon from "@/components/navbar/notificationIcon";
+import { getCart } from "@/services/store";
+import { getUserNotifications } from "@/services/notification";
+import { User } from "@/models/user";
+import { Cart } from "@/models/cart";
+import { Notification } from "@/models/notification";
 import {
   Navbar,
   NavbarBrand,
@@ -15,8 +21,6 @@ import {
   Tooltip,
 } from "@nextui-org/react";
 import { FaCartShopping } from "react-icons/fa6";
-import { Cart } from "@/models/cart";
-import { getCart } from "@/services/store";
 
 const AcmeLogo = () => (
   <svg fill="none" height="36" viewBox="0 0 32 32" width="36">
@@ -79,10 +83,12 @@ const checkImage = async (url: string) => {
 
 async function AppNavbar({ session }: Props) {
   const token = cookies().get("token")?.value;
-  const user = cookies().get("user")?.value as any;
+  const user: User = cookies().get("user")
+    ? JSON.parse(cookies().get("user")?.value as string)
+    : null;
   const cartId = cookies().get("cartId")?.value as string;
 
-  const userImage = user ? JSON.parse(user).avatarUrl : null;
+  const userImage = user ? user.avatarUrl : null;
 
   const isValidImage = session
     ? await checkImage(session.user?.image!)
@@ -90,24 +96,33 @@ async function AppNavbar({ session }: Props) {
     ? await checkImage(userImage)
     : false;
 
-  const cart: Cart = await getCart(cartId);
+  const cart: Cart = cartId ? await getCart(cartId) : null;
+  let userNotifications: Notification[] = user
+    ? await getUserNotifications(user.email)
+    : null;
+  if (userNotifications) {
+    userNotifications = userNotifications.sort(
+      (a: Notification, b: Notification) =>
+        new Date(b.createdAt) - new Date(a.createdAt)
+    );
+  }
 
   return (
     <Navbar isBordered className="hidden sm:flex">
       <NavbarContent justify="start">
         <NavbarBrand className="mr-4">
           <AcmeLogo />
-          <p className="hidden sm:block font-bold text-inherit">ACME</p>
+          <p className="hidden sm:block font-bold text-inherit"> </p>
         </NavbarBrand>
         <NavbarContent className="hidden sm:flex gap-3">
           <NavbarItem>
-            <Link color="foreground" href="#">
-              Features
+            <Link color="foreground" href="/games">
+              Games
             </Link>
           </NavbarItem>
           <NavbarItem isActive>
-            <Link href="#" aria-current="page" color="secondary">
-              Customers
+            <Link href="/store" aria-current="page" color="secondary">
+              Store
             </Link>
           </NavbarItem>
           <NavbarItem>
@@ -150,10 +165,11 @@ async function AppNavbar({ session }: Props) {
               shape="circle"
               className="cursor-pointer"
             >
-              <FaCartShopping className="w-9 text-gray-600" />
+              <FaCartShopping className="w-9 text-white" />
             </Badge>
           </Link>
         </Tooltip>
+        {user && <NotificationIcon notifications={userNotifications} />}
         <Avatar session={session} isValidImage={isValidImage} />
         <AuthState session={session} token={token} />
       </NavbarContent>
