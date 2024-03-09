@@ -22,11 +22,16 @@ export default function CartActions({
       <Button
         color="danger"
         variant="flat"
-        onPress={() => {
-          deleteProductsCart();
-          removeCartNotification();
-          Cookies.remove("cartId");
-          router.push("/");
+        onPress={async () => {
+          try {
+            await deleteProductsCart();
+            await removeCartNotification();
+            Cookies.remove("cartId");
+            router.refresh();
+            router.push("/");
+          } catch (e) {
+            alert(e);
+          }
         }}
       >
         Remove Cart
