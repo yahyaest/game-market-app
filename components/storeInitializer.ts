@@ -1,9 +1,10 @@
 "use client";
 
-import { useCartStore } from "@/store2";
 import { useRef } from "react";
+import { useCartStore, useNotificationStore } from "@/store2";
+import { Notification } from "../models/notification";
 
-function StoreInitializer({
+export function CartStoreInitializer({
   totalCartItems,
   totalCartPrice,
   totalCartPriceAfterDiscount,
@@ -24,4 +25,20 @@ function StoreInitializer({
   return null;
 }
 
-export default StoreInitializer;
+export function NotificationStoreInitializer({
+  navbarNotifications,
+  navbarNotificationsCount,
+}: {
+  navbarNotifications: Notification[];
+  navbarNotificationsCount: number;
+}) {
+  const initialized = useRef(false);
+  if (!initialized.current) {
+    useNotificationStore.setState({
+      navbarNotifications,
+      navbarNotificationsCount,
+    });
+    initialized.current = true;
+  }
+  return null;
+}

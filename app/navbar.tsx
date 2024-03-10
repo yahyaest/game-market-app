@@ -21,6 +21,8 @@ import {
   Tooltip,
 } from "@nextui-org/react";
 import { FaCartShopping } from "react-icons/fa6";
+import { useNotificationStore } from "@/store2";
+import { NotificationStoreInitializer } from "@/components/storeInitializer";
 
 const AcmeLogo = () => (
   <svg fill="none" height="36" viewBox="0 0 32 32" width="36">
@@ -105,75 +107,96 @@ async function AppNavbar({ session }: Props) {
       (a: Notification, b: Notification) =>
         new Date(b.createdAt) - new Date(a.createdAt)
     );
+    useNotificationStore.setState({
+      navbarNotifications: userNotifications
+        .filter((notification) => !notification.seen)
+        .slice(0, 5),
+      navbarNotificationsCount: userNotifications.filter(
+        (notification) => !notification.seen
+      ).length,
+    });
   }
 
   return (
-    <Navbar isBordered className="hidden sm:flex">
-      <NavbarContent justify="start">
-        <NavbarBrand className="mr-4">
-          <AcmeLogo />
-          <p className="hidden sm:block font-bold text-inherit"> </p>
-        </NavbarBrand>
-        <NavbarContent className="hidden sm:flex gap-3">
-          <NavbarItem>
-            <Link color="foreground" href="/games">
-              Games
-            </Link>
-          </NavbarItem>
-          <NavbarItem isActive>
-            <Link href="/store" aria-current="page" color="secondary">
-              Store
-            </Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Link color="foreground" href="#">
-              Integrations
-            </Link>
-          </NavbarItem>
-        </NavbarContent>
-      </NavbarContent>
-
-      <NavbarContent as="div" className="items-center" justify="end">
-        <Input
-          classNames={{
-            base: "max-w-full sm:max-w-[10rem] h-10",
-            mainWrapper: "h-full",
-            input: "text-small",
-            inputWrapper:
-              "h-full font-normal text-default-500 bg-default-400/20 dark:bg-default-500/20",
-          }}
-          placeholder="Type to search..."
-          size="sm"
-          startContent={<SearchIcon size={18} />}
-          type="search"
-        />
-        <Tooltip
-          content={
-            <div className="px-1 py-2">
-              <div className="text-small font-bold">Total Price</div>
-              <div className="text-tiny">
-                {cart ? cart.total_price_after_discount.toFixed(1) : 0} $
-              </div>
-            </div>
+    <>
+      {userNotifications && (
+        <NotificationStoreInitializer
+          navbarNotifications={userNotifications
+            .filter((notification) => !notification.seen)
+            .slice(0, 5)}
+          navbarNotificationsCount={
+            userNotifications.filter((notification) => !notification.seen)
+              .length
           }
-        >
-          <Link href="/cart">
-            <Badge
-              color="warning"
-              content={cart?.items_count ? cart?.items_count : 0}
-              isInvisible={false}
-              shape="circle"
-              className="cursor-pointer"
-            >
-              <FaCartShopping className="w-9 text-white" />
-            </Badge>
-          </Link>
-        </Tooltip>
-        {user && <NotificationIcon notifications={userNotifications} />}
-        <Avatar session={session} isValidImage={isValidImage} />
-        <AuthState session={session} token={token} />
-      </NavbarContent>
-    </Navbar>
+        />
+      )}
+      <Navbar isBordered className="hidden sm:flex">
+        <NavbarContent justify="start">
+          <NavbarBrand className="mr-4">
+            <AcmeLogo />
+            <p className="hidden sm:block font-bold text-inherit"> </p>
+          </NavbarBrand>
+          <NavbarContent className="hidden sm:flex gap-3">
+            <NavbarItem>
+              <Link color="foreground" href="/games">
+                Games
+              </Link>
+            </NavbarItem>
+            <NavbarItem isActive>
+              <Link href="/store" aria-current="page" color="secondary">
+                Store
+              </Link>
+            </NavbarItem>
+            <NavbarItem>
+              <Link color="foreground" href="#">
+                Integrations
+              </Link>
+            </NavbarItem>
+          </NavbarContent>
+        </NavbarContent>
+
+        <NavbarContent as="div" className="items-center" justify="end">
+          <Input
+            classNames={{
+              base: "max-w-full sm:max-w-[10rem] h-10",
+              mainWrapper: "h-full",
+              input: "text-small",
+              inputWrapper:
+                "h-full font-normal text-default-500 bg-default-400/20 dark:bg-default-500/20",
+            }}
+            placeholder="Type to search..."
+            size="sm"
+            startContent={<SearchIcon size={18} />}
+            type="search"
+          />
+          <Tooltip
+            content={
+              <div className="px-1 py-2">
+                <div className="text-small font-bold">Total Price</div>
+                <div className="text-tiny">
+                  {cart ? cart.total_price_after_discount.toFixed(1) : 0} $
+                </div>
+              </div>
+            }
+          >
+            <Link href="/cart">
+              <Badge
+                color="warning"
+                content={cart?.items_count ? cart?.items_count : 0}
+                isInvisible={false}
+                shape="circle"
+                className="cursor-pointer"
+              >
+                <FaCartShopping className="w-9 text-white" />
+              </Badge>
+            </Link>
+          </Tooltip>
+          {user && <NotificationIcon notifications={userNotifications} />}
+          <Avatar session={session} isValidImage={isValidImage} />
+          <AuthState session={session} token={token} />
+        </NavbarContent>
+      </Navbar>
+    </>
   );
 }
 

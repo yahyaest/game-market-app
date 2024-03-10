@@ -35,6 +35,7 @@ export default function AuthForm() {
         setIsUser(true);
         setAvatarUrl(userImage);
         router.push("/");
+        router.refresh();
       }
     } catch (error: any) {
       console.log(error.message);

@@ -13,6 +13,7 @@ import {
 } from "@nextui-org/react";
 import { navbarStateIsUser, navbarStateUserAvatarUrl } from "@/store";
 import { logout } from "@/services/gateway";
+import { useRouter } from "next/navigation";
 
 type Props = {
   session: any;
@@ -28,6 +29,7 @@ export default function UserAvatar({ session, isValidImage }: Props) {
   const [isUser, setIsUser] = useAtom(navbarStateIsUser);
   const [avatarUrl, setAvatarUrl] = useAtom(navbarStateUserAvatarUrl);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -109,6 +111,7 @@ export default function UserAvatar({ session, isValidImage }: Props) {
                 setIsUser(false);
                 setUserToken("");
                 setAvatarUrl("");
+                router.refresh();
               }}
             >
               Log Out

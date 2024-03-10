@@ -13,6 +13,7 @@ import {
   Chip,
 } from "@nextui-org/react";
 import { FaCartPlus } from "react-icons/fa6";
+import { useNotificationStore } from "@/store2";
 
 type Props = {
   postOrUpdateCart: (quantity: number) => Promise<any>;
@@ -29,6 +30,7 @@ export default function AddToCart({
 }: Props) {
   const [quantity, setQuantity] = useState(1);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { navbarNotifications, navbarNotificationsCount } = useNotificationStore();
   const router = useRouter();
 
   return (
@@ -95,7 +97,13 @@ export default function AddToCart({
                   isDisabled={quantity > gameInventory}
                   onClick={async() => {
                     await postOrUpdateCart(quantity);
-                    await addNotification(quantity);
+                    const notification = await addNotification(quantity);
+                    let currentNavbarNotifications = [...navbarNotifications];
+                    currentNavbarNotifications.unshift(notification)
+                    useNotificationStore.setState({
+                      navbarNotificationsCount: navbarNotificationsCount + 1,
+                      navbarNotifications: currentNavbarNotifications.slice(0, 5),
+                    });
                     router.refresh();
                   }}
                 >

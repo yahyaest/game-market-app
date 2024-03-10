@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Dropdown,
@@ -13,6 +13,7 @@ import { Notification } from "@/models/notification";
 import { FaBell } from "react-icons/fa6";
 import { formatRelativeTime } from "@/tools/utils";
 import { updateNotification } from "@/services/notification";
+import { useNotificationStore } from "@/store2";
 
 type Props = {
   notifications: Notification[];
@@ -20,6 +21,8 @@ type Props = {
 
 export default function NotificationIcon({ notifications }: Props) {
   const gatewayBaseUrl = process.env.GATEWAY_BASE_URL;
+  const [latestSeenNotification, setLatestSeenNotification] = useState<Notification[]>(notifications);
+  const { navbarNotifications, navbarNotificationsCount } = useNotificationStore();
   const router = useRouter();
   return (
     <Dropdown>
@@ -27,10 +30,12 @@ export default function NotificationIcon({ notifications }: Props) {
         <Badge
           color="warning"
           content={
-            notifications
-              ? notifications.length < 100
-                ? notifications.length
-                : "+99"
+            notifications &&
+            navbarNotificationsCount > 0 &&
+            navbarNotificationsCount < 100
+              ? navbarNotificationsCount
+              : notifications && navbarNotificationsCount >= 100
+              ? "+99"
               : 0
           }
           isInvisible={false}
@@ -42,16 +47,24 @@ export default function NotificationIcon({ notifications }: Props) {
       </DropdownTrigger>
       <DropdownMenu
         aria-label="Action event example"
-        onAction={(key) =>
-          key !== "all"
-            ? updateNotification(key as number, { seen: true })
-            : null
-        }
+        onAction={async (key) => {
+          if (key !== "all") {
+            await updateNotification(key as number, { seen: true });
+            const filteredNotifications = latestSeenNotification
+              .filter((notification) => !notification.seen)
+              .filter((notification) => notification.id !== +key);
+            setLatestSeenNotification(filteredNotifications);
+            useNotificationStore.setState({
+              navbarNotificationsCount: navbarNotificationsCount - 1,
+              navbarNotifications: filteredNotifications.slice(0, 5),
+            });
+          }
+        }}
       >
-        {notifications.length > 0 ? (
-          notifications
-            .filter((notification) => !notification.seen)
-            .slice(0, 5)
+        {navbarNotifications.length > 0 ? (
+          navbarNotifications
+            // .filter((notification) => !notification.seen)
+            // .slice(0, 5)
             .map((notification) => (
               <DropdownItem key={notification.id}>
                 <div className="flex flex-row justify-between items-center">
@@ -72,16 +85,16 @@ export default function NotificationIcon({ notifications }: Props) {
               </DropdownItem>
             ))
         ) : (
-          <></>
+          <DropdownItem></DropdownItem>
         )}
-        {notifications.length > 5 ? (
+        {navbarNotificationsCount > 0 ? (
           <DropdownItem key="all">
             <div className="text-center text-lg text-blue-500 font-bold">
-              See All Notifications
+              See All Notifications ({notifications.length})
             </div>
           </DropdownItem>
         ) : (
-          <></>
+          <DropdownItem></DropdownItem>
         )}
       </DropdownMenu>
     </Dropdown>

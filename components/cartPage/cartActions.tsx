@@ -3,6 +3,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { Button } from "@nextui-org/react";
+import { useNotificationStore } from "@/store2";
 
 type Props = {
   deleteProductsCart: () => Promise<any>;
@@ -13,6 +14,8 @@ export default function CartActions({
   deleteProductsCart,
   removeCartNotification,
 }: Props) {
+  const { navbarNotifications, navbarNotificationsCount } =
+    useNotificationStore();
   const router = useRouter();
   return (
     <div className="flex flex-row my-5 space-x-2">
@@ -25,7 +28,13 @@ export default function CartActions({
         onPress={async () => {
           try {
             await deleteProductsCart();
-            await removeCartNotification();
+            const notification = await removeCartNotification();
+            let currentNavbarNotifications = [...navbarNotifications];
+            currentNavbarNotifications.unshift(notification);
+            useNotificationStore.setState({
+              navbarNotificationsCount: navbarNotificationsCount + 1,
+              navbarNotifications: currentNavbarNotifications.slice(0, 5),
+            });
             Cookies.remove("cartId");
             router.refresh();
             router.push("/");
