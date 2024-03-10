@@ -89,7 +89,7 @@ export default function NotificationIcon({ notifications }: Props) {
         )}
         {navbarNotificationsCount > 0 ? (
           <DropdownItem key="all">
-            <div className="text-center text-lg text-blue-500 font-bold">
+            <div className="text-center text-lg text-blue-500 font-bold" onClick={()=> router.push("/notifications")}>
               See All Notifications ({notifications.length})
             </div>
           </DropdownItem>
