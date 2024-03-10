@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { useCartStore, useNotificationStore } from "@/store2";
+import { useCartStore, useNotificationStore } from "@/zustandStore";
 import { Notification } from "../models/notification";
 
 export function CartStoreInitializer({

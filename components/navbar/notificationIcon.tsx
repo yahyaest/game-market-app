@@ -13,7 +13,7 @@ import { Notification } from "@/models/notification";
 import { FaBell } from "react-icons/fa6";
 import { formatRelativeTime } from "@/tools/utils";
 import { updateNotification } from "@/services/notification";
-import { useNotificationStore } from "@/store2";
+import { useNotificationStore } from "@/zustandStore";
 
 type Props = {
   notifications: Notification[];

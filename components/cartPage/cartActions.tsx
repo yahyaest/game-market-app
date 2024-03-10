@@ -3,7 +3,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { Button } from "@nextui-org/react";
-import { useNotificationStore } from "@/store2";
+import { useNotificationStore } from "@/zustandStore";
 
 type Props = {
   deleteProductsCart: () => Promise<any>;

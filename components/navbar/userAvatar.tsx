@@ -11,7 +11,7 @@ import {
   DropdownTrigger,
   Skeleton,
 } from "@nextui-org/react";
-import { navbarStateIsUser, navbarStateUserAvatarUrl } from "@/store";
+import { navbarStateIsUser, navbarStateUserAvatarUrl } from "@/jotaiStore";
 import { logout } from "@/services/gateway";
 import { useRouter } from "next/navigation";
 

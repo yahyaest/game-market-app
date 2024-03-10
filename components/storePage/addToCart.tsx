@@ -13,7 +13,7 @@ import {
   Chip,
 } from "@nextui-org/react";
 import { FaCartPlus } from "react-icons/fa6";
-import { useNotificationStore } from "@/store2";
+import { useNotificationStore } from "@/zustandStore";
 
 type Props = {
   postOrUpdateCart: (quantity: number) => Promise<any>;

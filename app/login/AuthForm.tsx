@@ -9,7 +9,7 @@ import {
   getCurrentUserAvatar,
   login,
 } from "@/services/gateway";
-import { navbarStateIsUser, navbarStateUserAvatarUrl } from "@/store";
+import { navbarStateIsUser, navbarStateUserAvatarUrl } from "@/jotaiStore";
 import { User } from "@/models/user";
 
 export default function AuthForm() {

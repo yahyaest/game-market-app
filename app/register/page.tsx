@@ -11,7 +11,7 @@ import {
 import { Button, Input } from "@nextui-org/react";
 import styles from "./styles.module.css";
 import { User } from "@/models/user";
-import { navbarStateIsUser, navbarStateUserAvatarUrl } from "@/store";
+import { navbarStateIsUser, navbarStateUserAvatarUrl } from "@/jotaiStore";
 import { useAtom } from "jotai";
 
 export default function Register() {

@@ -21,7 +21,7 @@ import {
   Tooltip,
 } from "@nextui-org/react";
 import { FaCartShopping } from "react-icons/fa6";
-import { useNotificationStore } from "@/store2";
+import { useNotificationStore } from "@/zustandStore";
 import { NotificationStoreInitializer } from "@/components/storeInitializer";
 
 const AcmeLogo = () => (

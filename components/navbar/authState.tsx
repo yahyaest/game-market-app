@@ -7,7 +7,7 @@ import { useAtom } from "jotai";
 import Cookies from "js-cookie";
 import { logout } from "@/services/gateway";
 import { Button } from "@nextui-org/react";
-import { navbarStateIsUser, navbarStateUserAvatarUrl } from "@/store";
+import { navbarStateIsUser, navbarStateUserAvatarUrl } from "@/jotaiStore";
 
 type Props = {
   session: Awaited<ReturnType<typeof getServerSession>>;
