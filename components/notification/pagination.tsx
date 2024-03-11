@@ -6,26 +6,32 @@ import { Notification } from "@/models/notification";
 type Props = {
   notifications: Notification[];
   setCurrentNotifications: Dispatch<SetStateAction<any>>;
+  setCurrentPage: Dispatch<SetStateAction<any>>;
+  currentPage: number;
+  setPageNumber: Dispatch<SetStateAction<any>>;
+  pageNumber: number;
   notificationsCount: number;
+  notificationFilter: string;
 };
 
 export default function PaginationComponent({
   notifications,
   setCurrentNotifications,
+  setCurrentPage,
+  currentPage,
+  setPageNumber,
+  pageNumber,
   notificationsCount,
+  notificationFilter,
 }: Props) {
-  const [pageNumber, setPageNumber] = useState(0);
+  // const [pageNumber, setPageNumber] = useState(0);
+  // const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedPage, setSelectedPage] = useState(1);
 
   useEffect(() => {
     const fetchData = async () => {
-      setPageNumber(
-        Math.floor(
-          notificationsCount / pageSize
-        ) + 1
-      );
+      setPageNumber(Math.ceil(notificationsCount / pageSize));
     };
     fetchData();
   }, []);
@@ -43,7 +49,13 @@ export default function PaginationComponent({
         initialPage={1}
         onChange={async (page: number) => {
           setCurrentPage(page);
-          setCurrentNotifications(notifications.slice(pageSize * (page - 1), pageSize * page));
+          const displayedNotifications =
+            notificationFilter === "all"
+              ? notifications.slice(pageSize * (page - 1), pageSize * page)
+              : notifications
+                  .filter((notification) => !notification.seen)
+                  .slice(pageSize * (page - 1), pageSize * page);
+          setCurrentNotifications(displayedNotifications);
         }}
       />
       <Button
@@ -53,7 +65,19 @@ export default function PaginationComponent({
         size="sm"
         onClick={async () => {
           setCurrentPage(selectedPage);
-          setCurrentNotifications(notifications.slice(pageSize * (selectedPage - 1), pageSize * selectedPage));
+          const displayedNotifications =
+            notificationFilter === "all"
+              ? notifications.slice(
+                  pageSize * (selectedPage - 1),
+                  pageSize * selectedPage
+                )
+              : notifications
+                  .filter((notification) => !notification.seen)
+                  .slice(
+                    pageSize * (selectedPage - 1),
+                    pageSize * selectedPage
+                  );
+          setCurrentNotifications(displayedNotifications);
         }}
       >
         Go To Page

@@ -1,6 +1,5 @@
 "use client";
 import React, { Key, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Table,
   TableHeader,
@@ -13,6 +12,7 @@ import {
 } from "@nextui-org/react";
 import { Notification } from "@/models/notification";
 import PaginationComponent from "./pagination";
+import NotificationTabs from "./notificationTabs";
 import { formatRelativeTime } from "@/tools/utils";
 import { updateNotification } from "@/services/notification";
 
@@ -30,8 +30,15 @@ type Props = {
 
 export default function NotificationComponent({ notifications }: Props) {
   const gatewayBaseUrl = process.env.GATEWAY_BASE_URL;
-  const [currentNotifications, setCurrentNotifications] = useState<Notification[]>(notifications.slice(0,20));
-  const router = useRouter();
+  const [notificationFilter, setNotificationFilter] = useState<string>("all");
+  const [currentNotifications, setCurrentNotifications] = useState<
+    Notification[]
+  >(notifications.slice(0, 20));
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [pageNumber, setPageNumber] = useState(
+    Math.ceil(notifications.length / pageSize)
+  );
 
   const renderCell = (notification: Notification, columnKey: Key) => {
     switch (columnKey) {
@@ -50,7 +57,7 @@ export default function NotificationComponent({ notifications }: Props) {
       case "message":
         return <div>{notification.message}</div>;
       case "createdAt":
-        return <div>{formatRelativeTime(notification?.createdAt ?? "")} $</div>;
+        return <div>{formatRelativeTime(notification?.createdAt ?? "")}</div>;
       case "action":
         if (!notification.seen) {
           return (
@@ -60,8 +67,10 @@ export default function NotificationComponent({ notifications }: Props) {
               radius="lg"
               size="sm"
               onClick={async () => {
-                await updateNotification(notification.id as number, { seen: true });
-                router.refresh();
+                await updateNotification(notification.id as number, {
+                  seen: true,
+                });
+                location.reload();
               }}
             >
               Mark As Read
@@ -101,9 +110,16 @@ export default function NotificationComponent({ notifications }: Props) {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-between p-4 md:p-16">
+    <div className="flex min-h-screen flex-col items-center p-4 md:p-16">
+      <NotificationTabs
+        notifications={notifications}
+        setCurrentNotifications={setCurrentNotifications}
+        setNotificationFilter={setNotificationFilter}
+        setCurrentPage={setCurrentPage}
+        setPageNumber={setPageNumber}
+      />
       <div className="w-full">
-        {notifications && notifications.length > 0 ? (
+        {currentNotifications && currentNotifications.length > 0 ? (
           <div>
             <h1 className="text-center text-amber-600 text-3xl font-bold my-5">
               You have {notifications.length} Notifications
@@ -116,11 +132,16 @@ export default function NotificationComponent({ notifications }: Props) {
           </h1>
         )}
       </div>
-      {notifications && (
+      {notifications && pageNumber > 1 && (
         <PaginationComponent
           notifications={notifications}
           notificationsCount={notifications.length}
           setCurrentNotifications={setCurrentNotifications}
+          setCurrentPage={setCurrentPage}
+          currentPage={currentPage}
+          pageNumber={pageNumber}
+          setPageNumber={setPageNumber}
+          notificationFilter={notificationFilter}
         />
       )}
     </div>
